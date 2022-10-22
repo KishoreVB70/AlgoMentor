@@ -45,7 +45,7 @@ const compileProgram = async (programSource) => {
 }
 
 // CREATE MENTOR: ApplicationCreateTxn
-export const createMentor = async (senderAddress, mentor) => {
+export const createMentorAction = async (senderAddress, mentor) => {
     console.log("Adding mentor...")
 
     let params = await algodClient.getTransactionParams().do();
@@ -61,6 +61,7 @@ export const createMentor = async (senderAddress, mentor) => {
     let expertise = new TextEncoder().encode(mentor.expertise);
     let description = new TextEncoder().encode(mentor.description);
     let image = new TextEncoder().encode(mentor.image);
+    console.log(image);
     let price = algosdk.encodeUint64(mentor.price);
 
 
@@ -104,7 +105,7 @@ export const createMentor = async (senderAddress, mentor) => {
 
 
 // BUY PRODUCT: Group transaction consisting of ApplicationCallTxn and PaymentTxn
-export const buyProductAction = async (senderAddress, mentor, hours) => {
+export const buyMentorAction = async (senderAddress, mentor, hours) => {
     console.log("Buying mentor...");
 
     let params = await algodClient.getTransactionParams().do();
@@ -150,7 +151,7 @@ export const buyProductAction = async (senderAddress, mentor, hours) => {
     // Notify about completion
     console.log("Group transaction " + tx.txId + " confirmed in round " + confirmedTxn["confirmed-round"]);
 }
-export const deleteProductAction = async (senderAddress, index) => {
+export const deleteMentorAction = async (senderAddress, index) => {
     console.log("Deleting application...");
 
     let params = await algodClient.getTransactionParams().do();
@@ -182,7 +183,7 @@ export const deleteProductAction = async (senderAddress, index) => {
     console.log("Deleted app-id: ", appId);
 }
 // GET PRODUCTS: Use indexer
-export const getProductsAction = async () => {
+export const getMentorAction = async () => {
     console.log("Fetching products...")
     let note = new TextEncoder().encode(mentorNote);
     let encodedNote = Buffer.from(note).toString("base64");

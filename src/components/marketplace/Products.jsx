@@ -3,21 +3,21 @@ import {toast} from "react-toastify";
 import AddMentor from "./AddMentor";
 import Loader from "../utils/Loader";
 import {NotificationError, NotificationSuccess} from "../utils/Notifications";
-import {createMentor, getProductsAction,} from "../../utils/marketplace";
+import {createMentorAction, getMentorAction,} from "../../utils/marketplace";
 import PropTypes from "prop-types";
 import {Row} from "react-bootstrap";
 
 const Products = ({address, fetchBalance}) => {
     const [loading, setLoading] = useState(false);
-    const [products, setProducts] = useState([]);
+    const [mentors, setMentors] = useState([]);
     
 
-    const getProducts = async () => {
+    const getMentors = async () => {
         setLoading(true);
-        getProductsAction()
-            .then(products => {
-                if (products) {
-                    setProducts(products);
+        getMentorAction()
+            .then(mentors => {
+                if (mentors) {
+                    setMentors(mentors);
                 }
             })
             .catch(error => {
@@ -29,16 +29,17 @@ const Products = ({address, fetchBalance}) => {
         };
         
         useEffect(() => {
-            getProducts();
+            getMentors();
         }, []);
         
 
-    const createProduct = async (data) => {
+    const createMentor = async (data) => {
         setLoading(true);
-        createMentor(address, data)
+        console.log(data)
+        createMentorAction(address, data)
             .then(() => {
-                toast(<NotificationSuccess text="Product added successfully."/>);
-                getProducts();
+                toast(<NotificationSuccess text="Mentor added successfully."/>);
+                getMentors();
                 fetchBalance(address);
             })
             .catch(error => {
@@ -55,7 +56,7 @@ const Products = ({address, fetchBalance}) => {
 	    <>
 	        <div className="d-flex justify-content-between align-items-center mb-4">
 	            <h1 className="fs-4 fw-bold mb-0">Algo Mentorship</h1>
-	            <AddMentor createProduct={createProduct}/>
+	            <AddMentor createMentor={createMentor}/>
 	        </div>
 	    </>
 	);

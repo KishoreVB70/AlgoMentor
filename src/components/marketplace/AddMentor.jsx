@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import {Button, FloatingLabel, Form, Modal} from "react-bootstrap";
 import {stringToMicroAlgos} from "../../utils/conversions";
 
-const AddMentor = ({createProduct}) => {
+const AddMentor = ({createMentor}) => {
     const [expertise, setName] = useState("");
     const [description, setDescription] = useState("");
     const [image, setImage] = useState("");
@@ -30,7 +30,7 @@ const AddMentor = ({createProduct}) => {
             </Button>
             <Modal show={show} onHide={handleClose} centered>
                 <Modal.Header closeButton>
-                    <Modal.Title>New Product</Modal.Title>
+                    <Modal.Title>New Mentor</Modal.Title>
                 </Modal.Header>
                 <Form>
                     <Modal.Body>
@@ -98,15 +98,16 @@ const AddMentor = ({createProduct}) => {
                         variant="dark"
                         disabled={!isFormFilled()}
                         onClick={() => {
-                            createProduct({
+                            createMentor({
                                 expertise,
                                 description,
+                                image,
                                 price
                             });
                             handleClose();
                         }}
                     >
-                        Save product
+                        Save Mentor
                     </Button>
                 </Modal.Footer>
             </Modal>
@@ -115,7 +116,7 @@ const AddMentor = ({createProduct}) => {
 };
 
 AddMentor.propTypes = {
-    createProduct: PropTypes.func.isRequired,
+    createMentor: PropTypes.func.isRequired,
 };
 
 export default AddMentor;

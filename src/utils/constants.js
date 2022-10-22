@@ -18,6 +18,9 @@ export const myAlgoConnect = new MyAlgoConnect();
 
 export const minRound = 21540981;
 
+export const ALGORAND_DECIMALS = 6;
+
+
 // https://github.com/algorandfoundation/ARCs/blob/main/ARCs/arc-0002.md
 export const marketplaceNote = "tutorial-marketplace:uv1"
 export const mentorNote = "mentorship:k1"

@@ -6,11 +6,12 @@ import {stringToMicroAlgos} from "../../utils/conversions";
 const AddMentor = ({createProduct}) => {
     const [expertise, setName] = useState("");
     const [description, setDescription] = useState("");
+    const [image, setImage] = useState("");
     const [price, setPrice] = useState(0);
 
     const isFormFilled = useCallback(() => {
-        return expertise && description && price > 0
-    }, [expertise, description, price]);
+        return expertise && description && image && price > 0
+    }, [expertise, description, image, price]);
 
     const [show, setShow] = useState(false);
 
@@ -57,6 +58,20 @@ const AddMentor = ({createProduct}) => {
                                 style={{ height: "80px" }}
                                 onChange={(e) => {
                                     setDescription(e.target.value);
+                                }}
+                            />
+                        </FloatingLabel>
+                        <FloatingLabel
+                            controlId="inputUrl"
+                            label="Image URL"
+                            className="mb-3"
+                        >
+                            <Form.Control
+                                type="text"
+                                placeholder="Image URL"
+                                value={image}
+                                onChange={(e) => {
+                                    setImage(e.target.value);
                                 }}
                             />
                         </FloatingLabel>

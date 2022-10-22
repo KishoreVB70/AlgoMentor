@@ -145,11 +145,11 @@ global CreatorAddress
 return
 main_l16:
 txn NumAppArgs
-int 3
+int 4
 ==
 assert
 txn Note
-byte "mentorship:k1"
+byte "mentorship:k2"
 ==
 assert
 byte "EXPERTISE"
@@ -158,6 +158,9 @@ app_global_put
 byte "DESCRIPTION"
 txna ApplicationArgs 1
 app_global_put
+byte "IMAGE"
+txna ApplicationArgs 2
+app_global_put
 byte "NUMOFRATERS"
 int 0
 app_global_put
@@ -165,7 +168,7 @@ byte "AVGRATING"
 int 0
 app_global_put
 byte "PRICE"
-txna ApplicationArgs 2
+txna ApplicationArgs 3
 btoi
 app_global_put
 byte "TOTALRATING"

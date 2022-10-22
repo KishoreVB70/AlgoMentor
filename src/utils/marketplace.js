@@ -21,9 +21,10 @@ import clearProgram from "!!raw-loader!../contracts/mentorclear.teal";
 
 class Mentor {
     
-    constructor(expertise,description, price, avgrating, numofraters, totalrating, buyers, amountdonated, appId, owner) {
+    constructor(expertise, description, image, price, avgrating, numofraters, totalrating, buyers, amountdonated, appId, owner) {
         this.expertise = expertise;
         this.description = description;
+        this.image = image;
         this.price = price;
         this.avgrating = avgrating;
         this.numofraters = numofraters;
@@ -59,9 +60,11 @@ export const createMentor = async (senderAddress, mentor) => {
     let note = new TextEncoder().encode(mentorNote);
     let expertise = new TextEncoder().encode(mentor.expertise);
     let description = new TextEncoder().encode(mentor.description);
+    let image = new TextEncoder().encode(mentor.image);
     let price = algosdk.encodeUint64(mentor.price);
 
-    let appArgs = [expertise, description, price]
+
+    let appArgs = [expertise, description, image, price]
 
     // Create ApplicationCreateTxn
     let txn = algosdk.makeApplicationCreateTxnFromObject({
@@ -198,6 +201,7 @@ export const getProductsAction = async () => {
             let mentor = await getApplication(appId)
             if (mentor) {
                 products.push(mentor)
+                console.log(mentor)
             }
         }
     }
@@ -218,6 +222,7 @@ const getApplication = async (appId) => {
         let owner = response.application.params.creator
         let expertise = ""
         let description = ""
+        let image = ""
         let price = 0
         let buyers = 0
         let totalrating = 0
@@ -239,6 +244,11 @@ const getApplication = async (appId) => {
         if (getField("DESCRIPTION", globalState) !== undefined) {
             let field = getField("DESCRIPTION", globalState).value.bytes
             description = base64ToUTF8String(field)
+        }
+
+        if (getField("IMAGE", globalState) !== undefined) {
+            let field = getField("IMAGE", globalState).value.bytes
+            image = base64ToUTF8String(field)
         }
 
         if (getField("PRICE", globalState) !== undefined) {
@@ -265,7 +275,7 @@ const getApplication = async (appId) => {
             totalrating = getField("TOTALRATING", globalState).value.uint
         }
 
-        return new Mentor(expertise, description, price, avgrating, numberofraters, totalrating, buyers,amountdonated, appId, owner)
+        return new Mentor(expertise, description, image, price, avgrating, numberofraters, totalrating, buyers,amountdonated, appId, owner)
     } catch (err) {
         return null;
     }

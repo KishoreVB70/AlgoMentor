@@ -5,6 +5,7 @@ class Mentor:
     class Variables:
         expertise = Bytes("EXPERTISE") #byte
         description = Bytes("DESCRIPTION") #byte
+        image = Bytes("IMAGE") #byte
         price = Bytes("PRICE") # uint64
         avg_rating = Bytes("AVGRATING") #uint64
         num_of_raters = Bytes("NUMOFRATERS") #uint64
@@ -19,14 +20,15 @@ class Mentor:
 
     def application_creation(self):
         return Seq([
-            Assert(Txn.application_args.length() == Int(3)),
-            Assert(Txn.note() == Bytes("mentorship:k1")),
+            Assert(Txn.application_args.length() == Int(4)),
+            Assert(Txn.note() == Bytes("mentorship:k2")),
 
             App.globalPut(self.Variables.expertise, Txn.application_args[0]),
             App.globalPut(self.Variables.description, Txn.application_args[1]),
+            App.globalPut(self.Variables.image, Txn.application_args[2]),
             App.globalPut(self.Variables.num_of_raters, Int(0)),
             App.globalPut(self.Variables.avg_rating, Int(0)),
-            App.globalPut(self.Variables.price, Btoi(Txn.application_args[2])),
+            App.globalPut(self.Variables.price, Btoi(Txn.application_args[3])),
             
             App.globalPut(self.Variables.total_rating, Int(0)),
             App.globalPut(self.Variables.buyers, Int(0)),

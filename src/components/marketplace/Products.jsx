@@ -10,13 +10,13 @@ import {Row} from "react-bootstrap";
 const Products = ({address, fetchBalance}) => {
     const [loading, setLoading] = useState(false);
     const [products, setProducts] = useState([]);
+    
 
     const getProducts = async () => {
         setLoading(true);
         getProductsAction()
             .then(products => {
                 if (products) {
-                    console.log(products)
                     setProducts(products);
                 }
             })

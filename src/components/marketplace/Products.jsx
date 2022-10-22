@@ -1,19 +1,44 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import {toast} from "react-toastify";
 import AddMentor from "./AddMentor";
 import Loader from "../utils/Loader";
 import {NotificationError, NotificationSuccess} from "../utils/Notifications";
-import {createMentor} from "../../utils/marketplace";
+import {createMentor, getProductsAction,} from "../../utils/marketplace";
+import PropTypes from "prop-types";
+import {Row} from "react-bootstrap";
 
 const Products = ({address, fetchBalance}) => {
     const [loading, setLoading] = useState(false);
+    const [products, setProducts] = useState([]);
+
+    const getProducts = async () => {
+        setLoading(true);
+        getProductsAction()
+            .then(products => {
+                if (products) {
+                    console.log(products)
+                    setProducts(products);
+                }
+            })
+            .catch(error => {
+                console.log(error);
+            })
+            .finally(_ => {
+                setLoading(false);
+            });
+        };
+        
+        useEffect(() => {
+            getProducts();
+        }, []);
+        
 
     const createProduct = async (data) => {
         setLoading(true);
         createMentor(address, data)
             .then(() => {
                 toast(<NotificationSuccess text="Product added successfully."/>);
-                // getProducts();
+                getProducts();
                 fetchBalance(address);
             })
             .catch(error => {

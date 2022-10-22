@@ -9,6 +9,7 @@ import {Container, Nav} from "react-bootstrap";
 // import {Notification} from "./components/utils/Notifications";
 import {indexerClient, myAlgoConnect} from "./utils/constants";
 import coverImg from "./assets/mentor.jpg"
+import Products from "./components/marketplace/Products"
 
 const App = function AppWrapper() {
     const [address, setAddress] = useState(null);
@@ -62,7 +63,7 @@ const App = function AppWrapper() {
                         </Nav.Item>
                     </Nav>
                     <main>
-                        {/* <Products address={address} fetchBalance={fetchBalance}/> */}
+                        <Products address={address} fetchBalance={fetchBalance}/>
                     </main>
                 </Container>
             ) : (

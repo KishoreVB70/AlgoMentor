@@ -29,8 +29,8 @@ export const mentorNote = "mentorship:k1"
 export const numLocalInts = 0;
 export const numLocalBytes = 0;
 // Maximum global storage allocation, immutable
-export const numGlobalInts = 2; // Global variables stored as Int: count, sold
-export const numGlobalBytes = 3; // Global variables stored as Bytes: name, description, image
+export const numGlobalInts = 6; // Global variables stored as Int: count, sold
+export const numGlobalBytes = 2; // Global variables stored as Bytes: name, description, image
 
 export const base64ToUTF8String = (base64String) => {
     return Buffer.from(base64String, 'base64').toString("utf-8")

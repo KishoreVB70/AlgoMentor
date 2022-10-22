@@ -43,7 +43,7 @@ const compileProgram = async (programSource) => {
     return new Uint8Array(Buffer.from(compileResponse.result, "base64"));
 }
 
-// CREATE PRODUCT: ApplicationCreateTxn
+// CREATE MENTOR: ApplicationCreateTxn
 export const createMentor = async (senderAddress, mentor) => {
     console.log("Adding mentor...")
 

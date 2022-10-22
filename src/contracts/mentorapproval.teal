@@ -1,0 +1,181 @@
+#pragma version 6
+txn ApplicationID
+int 0
+==
+bnz main_l16
+txn OnCompletion
+int DeleteApplication
+==
+bnz main_l15
+txna ApplicationArgs 0
+byte "buy"
+==
+bnz main_l12
+txna ApplicationArgs 0
+byte "rate"
+==
+bnz main_l9
+txna ApplicationArgs 0
+byte "support"
+==
+bnz main_l6
+err
+main_l6:
+global GroupSize
+int 2
+==
+gtxn 1 TypeEnum
+int pay
+==
+gtxn 1 Receiver
+global CreatorAddress
+==
+&&
+gtxn 1 Amount
+txna ApplicationArgs 1
+btoi
+==
+&&
+gtxn 1 Sender
+gtxn 0 Sender
+==
+&&
+&&
+bnz main_l8
+int 0
+return
+main_l8:
+byte "AMOUNTDONATED"
+byte "AMOUNTDONATED"
+app_global_get
+btoi
+txna ApplicationArgs 1
+btoi
++
+app_global_put
+int 1
+return
+main_l9:
+txna ApplicationArgs 1
+btoi
+int 0
+>
+txna ApplicationArgs 1
+btoi
+int 5
+<=
+&&
+global GroupSize
+int 1
+==
+&&
+bnz main_l11
+int 0
+return
+main_l11:
+byte "NUMOFRATERS"
+byte "NUMOFRATERS"
+app_global_get
+btoi
+int 1
++
+app_global_put
+byte "TOTALRATING"
+byte "TOTALRATING"
+app_global_get
+btoi
+txna ApplicationArgs 1
+btoi
++
+app_global_put
+byte "AVGRATING"
+byte "TOTALRATING"
+app_global_get
+btoi
+byte "NUMOFRATERS"
+btoi
+/
+app_global_put
+int 1
+return
+main_l12:
+global GroupSize
+int 2
+==
+gtxn 1 TypeEnum
+int pay
+==
+gtxn 1 Receiver
+global CreatorAddress
+==
+&&
+gtxn 0 Sender
+global CreatorAddress
+!=
+&&
+gtxn 1 Amount
+byte "PRICE"
+app_global_get
+txna ApplicationArgs 1
+btoi
+*
+==
+&&
+gtxn 1 Sender
+gtxn 0 Sender
+==
+&&
+&&
+bnz main_l14
+int 0
+return
+main_l14:
+byte "BUYERS"
+byte "BUYERS"
+app_global_get
+int 1
++
+app_global_put
+int 1
+return
+main_l15:
+txn Sender
+global CreatorAddress
+==
+return
+main_l16:
+txn NumAppArgs
+int 3
+==
+assert
+txn Note
+byte "mentorship:k1"
+==
+assert
+byte "EXPERTISE"
+txna ApplicationArgs 0
+app_global_put
+byte "DESCRIPTION"
+txna ApplicationArgs 1
+app_global_put
+byte "NUMOFRATERS"
+int 0
+app_global_put
+byte "AVGRATING"
+int 0
+app_global_put
+byte "PRICE"
+txna ApplicationArgs 2
+btoi
+app_global_put
+byte "TOTALRATING"
+int 0
+app_global_put
+byte "BUYERS"
+int 0
+app_global_put
+byte "AMOUNTDONATED"
+int 0
+app_global_put
+int 1
+return

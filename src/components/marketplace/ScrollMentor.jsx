@@ -5,7 +5,6 @@ import Loader from "../utils/Loader";
 import {NotificationError, NotificationSuccess} from "../utils/Notifications";
 import {buyMentorAction, createMentorAction, deleteMentorAction, getMentorAction, rateMentorAction, changePriceAction, supportMentorAction} from "../../utils/marketplace";
 import PropTypes from "prop-types";
-import Mentor from "./Mentor";
 import NewMentor from "./NewMentor";
 
 const ScrollMentor = ({address, fetchBalance}) => {
@@ -103,13 +102,13 @@ const ScrollMentor = ({address, fetchBalance}) => {
 	    setLoading(true);
 	    changePriceAction(address, mentor, newPrice)
 	        .then(() => {
-	            toast(<NotificationSuccess text="Mentor Rated successfully"/>);
+	            toast(<NotificationSuccess text="Changed price"/>);
 	            getMentors();
 	            fetchBalance(address);
 	        })
 	        .catch(error => {
 	            console.log(error)
-	            toast(<NotificationError text="Failed to Rate mentor."/>);
+	            toast(<NotificationError text="Failed to Change price."/>);
 	            setLoading(false);
 	        })
 	};

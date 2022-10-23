@@ -22,7 +22,7 @@ export const ALGORAND_DECIMALS = 6;
 
 
 // https://github.com/algorandfoundation/ARCs/blob/main/ARCs/arc-0002.md
-export const mentorNote = "mentorship:k3"
+export const mentorNote = "mentorship:k6"
 
 // Maximum local storage allocation, immutable
 export const numLocalInts = 0;

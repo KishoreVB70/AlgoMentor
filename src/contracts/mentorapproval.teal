@@ -25,19 +25,18 @@ byte "changeprice"
 bnz main_l7
 err
 main_l7:
-global GroupSize
-int 2
-==
 txn Sender
 global CreatorAddress
 ==
-&&
 bnz main_l9
 int 0
 return
 main_l9:
+txn NumAppArgs
+int 2
+==
+assert
 byte "PRICE"
-app_global_get
 txna ApplicationArgs 1
 btoi
 app_global_put
@@ -58,6 +57,11 @@ gtxn 1 Sender
 gtxn 0 Sender
 ==
 &&
+&&
+txna ApplicationArgs 1
+btoi
+int 0
+>
 &&
 bnz main_l12
 int 0
@@ -82,14 +86,18 @@ btoi
 int 5
 <=
 &&
-global GroupSize
-int 2
-==
+txn Sender
+global CreatorAddress
+!=
 &&
 bnz main_l15
 int 0
 return
 main_l15:
+txn NumAppArgs
+int 2
+==
+assert
 byte "NUMOFRATERS"
 byte "NUMOFRATERS"
 app_global_get
@@ -163,7 +171,7 @@ int 3
 ==
 assert
 txn Note
-byte "mentorship:k3"
+byte "mentorship:k6"
 ==
 assert
 byte "EXPERTISE"

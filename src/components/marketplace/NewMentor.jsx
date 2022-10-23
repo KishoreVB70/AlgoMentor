@@ -1,12 +1,11 @@
 import React, {useState} from "react";
 import PropTypes from "prop-types";
-import {Badge, Button, FloatingLabel, Form, Stack} from "react-bootstrap";
+import {Button} from "react-bootstrap";
 import Dropdown from 'react-bootstrap/Dropdown';
 import {microAlgosToString, truncateAddress} from "../../utils/conversions";
-import Identicon from "../utils/Identicon";
 
 const NewMentor = ({address, mentor, buyMentor, deleteMentor, rateMentor, changePrice, supportMentor}) => {
-    const {expertise, description, price, avgrating, numofraters, totalrating, buyers, amountdonated, appId, owner} =
+    const {expertise, description, price, avgrating, numofraters,buyers, amountdonated, owner} =
         mentor;
 
     const [hours, setHours] = useState("")
@@ -24,10 +23,10 @@ const NewMentor = ({address, mentor, buyMentor, deleteMentor, rateMentor, change
                 <p>{description}</p>
                 <div className="details">
                     <p>Bought: {buyers}</p>
-                    <p>Raters: {numofraters}</p>
                     <p>Rating: {avgrating}</p>
-                    <p>Donated: {amountdonated}</p>
+                    <p>Raters: {numofraters}</p>
                 </div>
+                    <p>Amount Donated: {amountdonated} Algo</p>
                 {mentor.owner === address && 
                     <>   
                         <div className="edit">

@@ -158,7 +158,7 @@ export const rateMentorAction = async (senderAddress, mentor, rate) => {
     // Build required app args as Uint8Array
     let rateArg = new TextEncoder().encode("rate");
     console.log(rate);
-    let ratingArg = algosdk.encodeUint64(rate);
+    let ratingArg = algosdk.encodeUint64(parseInt(rate));
     console.log(ratingArg);
   
     let appArgs = [rateArg, ratingArg];
@@ -206,8 +206,9 @@ export const rateMentorAction = async (senderAddress, mentor, rate) => {
   
     // Build required app args as Uint8Array
     let changeArg = new TextEncoder().encode("changeprice");
-    console.log(amount)
-    let amountArg = algosdk.encodeUint64(stringToMicroAlgos(amount));
+    let crctAmount = stringToMicroAlgos(amount);
+    console.log(crctAmount)
+    let amountArg = algosdk.encodeUint64(crctAmount);
     console.log(amountArg)
     let appArgs = [changeArg, amountArg];
   
@@ -398,8 +399,8 @@ const getApplication = async (appId) => {
             avgrating = getField("AVGRATING", globalState).value.uint
         }
 
-        if (getField("NUMBEROFRATORS", globalState) !== undefined) {
-            numberofraters = getField("NUMBEROFRATORS", globalState).value.uint
+        if (getField("NUMOFRATERS", globalState) !== undefined) {
+            numberofraters = getField("NUMOFRATERS", globalState).value.uint
         }
 
         if (getField("AMOUNTDONATED", globalState) !== undefined) {

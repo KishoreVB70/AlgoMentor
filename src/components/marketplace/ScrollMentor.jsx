@@ -3,7 +3,7 @@ import {toast} from "react-toastify";
 import AddMentor from "./AddMentor";
 import Loader from "../utils/Loader";
 import {NotificationError, NotificationSuccess} from "../utils/Notifications";
-import {buyMentorAction, createMentorAction, deleteMentorAction, getMentorAction, rateMentorAction} from "../../utils/marketplace";
+import {buyMentorAction, createMentorAction, deleteMentorAction, getMentorAction, rateMentorAction, changePriceAction, supportMentorAction} from "../../utils/marketplace";
 import PropTypes from "prop-types";
 import Mentor from "./Mentor";
 import NewMentor from "./NewMentor";
@@ -66,10 +66,42 @@ const ScrollMentor = ({address, fetchBalance}) => {
 	        })
 	};
 
+    const supportMentor = async (mentor, amount) => {
+	    setLoading(true);
+        console.log(mentor);
+        console.log(amount);
+	    supportMentorAction(address, mentor, amount)
+	        .then(() => {
+	            toast(<NotificationSuccess text="Mentor Supported successfully"/>);
+	            getMentors();
+	            fetchBalance(address);
+	        })
+	        .catch(error => {
+	            console.log(error)
+	            toast(<NotificationError text="Failed to Support mentor."/>);
+	            setLoading(false);
+	        })
+	};
+
     const rateMentor = async (mentor, rating) => {
 	    setLoading(true);
         console.log(mentor);
 	    rateMentorAction(address, mentor, rating)
+	        .then(() => {
+	            toast(<NotificationSuccess text="Mentor Rated successfully"/>);
+	            getMentors();
+	            fetchBalance(address);
+	        })
+	        .catch(error => {
+	            console.log(error)
+	            toast(<NotificationError text="Failed to Rate mentor."/>);
+	            setLoading(false);
+	        })
+	};
+
+    const changePrice = async (mentor, newPrice) => {
+	    setLoading(true);
+	    changePriceAction(address, mentor, newPrice)
 	        .then(() => {
 	            toast(<NotificationSuccess text="Mentor Rated successfully"/>);
 	            getMentors();
@@ -114,6 +146,8 @@ const ScrollMentor = ({address, fetchBalance}) => {
 	                        buyMentor={buyMentor}
 	                        deleteMentor={deleteMentor}
                             rateMentor={rateMentor}
+                            changePrice={changePrice}
+                            supportMentor={supportMentor}
 	                        key={index}
 	                    />
 	                ))}

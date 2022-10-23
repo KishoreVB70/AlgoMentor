@@ -103,7 +103,8 @@ class Mentor:
         ])
         return If(canRate).Then(update_state).Else(Reject())
 
-    def changePrice(self):
+    # Function for the owner to change the price
+    def changeprice(self):
 
         canChange = And(
             Global.group_size() == Int(2),
@@ -132,6 +133,7 @@ class Mentor:
             [Txn.application_args[0] == self.AppMethods.buy, self.buy()],
             [Txn.application_args[0] == self.AppMethods.rate, self.rate()],
             [Txn.application_args[0] == self.AppMethods.support, self.support()],
+            [Txn.application_args[0] == self.AppMethods.changeprice, self.changeprice()],
         )
     def approval_program(self):
         return self.application_start()

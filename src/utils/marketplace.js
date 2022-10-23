@@ -17,6 +17,7 @@ import {
 /* eslint import/no-webpack-loader-syntax: off */
 import approvalProgram from "!!raw-loader!../contracts/mentorapproval.teal";
 import clearProgram from "!!raw-loader!../contracts/mentorclear.teal";
+import { stringToMicroAlgos } from "./conversions";
 
 
 class Mentor {
@@ -104,16 +105,15 @@ export const createMentorAction = async (senderAddress, mentor) => {
 // BUY PRODUCT: Group transaction consisting of ApplicationCallTxn and PaymentTxn
 export const buyMentorAction = async (senderAddress, mentor, hours) => {
     console.log("Buying mentor...");
-
+    
     let params = await algodClient.getTransactionParams().do();
     params.fee = algosdk.ALGORAND_MIN_TX_FEE;
     params.flatFee = true;
-
+    
     // Build required app args as Uint8Array
     let buyArg = new TextEncoder().encode("buy")
-    let hoursArg = algosdk.encodeUint64(hours);
+    let hoursArg = algosdk.encodeUint64(parseInt(hours));
     let appArgs = [buyArg, hoursArg]
-
     // Create ApplicationCallTxn
     let appCallTxn = algosdk.makeApplicationCallTxnFromObject({
         from: senderAddress,
@@ -198,6 +198,47 @@ export const rateMentorAction = async (senderAddress, mentor, rate) => {
         confirmedTxn["confirmed-round"]
     );
   };
+
+  export const changePriceAction = async (senderAddress, mentor, amount) => {
+    console.log("Change price...");
+  
+    let params = await algodClient.getTransactionParams().do();
+  
+    // Build required app args as Uint8Array
+    let changeArg = new TextEncoder().encode("changeprice");
+    console.log(amount)
+    let amountArg = algosdk.encodeUint64(stringToMicroAlgos(amount));
+    console.log(amountArg)
+    let appArgs = [changeArg, amountArg];
+  
+    // Create ApplicationCallTxn
+    let txn = algosdk.makeApplicationCallTxnFromObject({
+      from: senderAddress,
+      appIndex: mentor.appId,
+      onComplete: algosdk.OnApplicationComplete.NoOpOC,
+      suggestedParams: params,
+      appArgs,
+    });
+  
+    // Get transaction ID
+    let txId = txn.txID().toString();
+  
+    // Sign & submit the transaction
+    let signedTxn = await myAlgoConnect.signTransaction(txn.toByte());
+    console.log("Signed transaction with txID: %s", txId);
+    await algodClient.sendRawTransaction(signedTxn.blob).do();
+  
+    // Wait for transaction to be confirmed
+    let confirmedTxn = await algosdk.waitForConfirmation(algodClient, txId, 4);
+  
+    // Get the completed Transaction
+    console.log(
+      "Transaction " +
+        txId +
+        " confirmed in round " +
+        confirmedTxn["confirmed-round"]
+    );
+  };
   
 export const supportMentorAction = async (senderAddress, mentor, amount) => {
 
@@ -205,9 +246,11 @@ export const supportMentorAction = async (senderAddress, mentor, amount) => {
     params.fee = algosdk.ALGORAND_MIN_TX_FEE;
     params.flatFee = true;
 
+    let actualAmount = parseInt(amount)
     // Build required app args as Uint8Array
     let supportArg = new TextEncoder().encode("support")
-    let amountArg = algosdk.encodeUint64(amount);
+    console.log(amount)
+    let amountArg = algosdk.encodeUint64(actualAmount);
     let appArgs = [supportArg, amountArg]
 
     // Create ApplicationCallTxn
@@ -223,7 +266,7 @@ export const supportMentorAction = async (senderAddress, mentor, amount) => {
     let paymentTxn = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
         from: senderAddress,
         to: mentor.owner,
-        amount: amount,
+        amount: actualAmount,
         suggestedParams: params
     })
 

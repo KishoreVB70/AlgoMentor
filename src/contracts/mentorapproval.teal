@@ -2,25 +2,48 @@
 txn ApplicationID
 int 0
 ==
-bnz main_l16
+bnz main_l20
 txn OnCompletion
 int DeleteApplication
 ==
-bnz main_l15
+bnz main_l19
 txna ApplicationArgs 0
 byte "buy"
 ==
-bnz main_l12
+bnz main_l16
 txna ApplicationArgs 0
 byte "rate"
 ==
-bnz main_l9
+bnz main_l13
 txna ApplicationArgs 0
 byte "support"
 ==
-bnz main_l6
+bnz main_l10
+txna ApplicationArgs 0
+byte "changeprice"
+==
+bnz main_l7
 err
-main_l6:
+main_l7:
+global GroupSize
+int 2
+==
+txn Sender
+global CreatorAddress
+==
+&&
+bnz main_l9
+int 0
+return
+main_l9:
+byte "PRICE"
+app_global_get
+txna ApplicationArgs 1
+btoi
+app_global_put
+int 1
+return
+main_l10:
 global GroupSize
 int 2
 ==
@@ -36,10 +59,10 @@ gtxn 0 Sender
 ==
 &&
 &&
-bnz main_l8
+bnz main_l12
 int 0
 return
-main_l8:
+main_l12:
 byte "AMOUNTDONATED"
 byte "AMOUNTDONATED"
 app_global_get
@@ -49,7 +72,7 @@ btoi
 app_global_put
 int 1
 return
-main_l9:
+main_l13:
 txna ApplicationArgs 1
 btoi
 int 0
@@ -63,10 +86,10 @@ global GroupSize
 int 2
 ==
 &&
-bnz main_l11
+bnz main_l15
 int 0
 return
-main_l11:
+main_l15:
 byte "NUMOFRATERS"
 byte "NUMOFRATERS"
 app_global_get
@@ -89,7 +112,7 @@ app_global_get
 app_global_put
 int 1
 return
-main_l12:
+main_l16:
 global GroupSize
 int 2
 ==
@@ -117,10 +140,10 @@ gtxn 0 Sender
 ==
 &&
 &&
-bnz main_l14
+bnz main_l18
 int 0
 return
-main_l14:
+main_l18:
 byte "BUYERS"
 byte "BUYERS"
 app_global_get
@@ -129,12 +152,12 @@ int 1
 app_global_put
 int 1
 return
-main_l15:
+main_l19:
 txn Sender
 global CreatorAddress
 ==
 return
-main_l16:
+main_l20:
 txn NumAppArgs
 int 3
 ==

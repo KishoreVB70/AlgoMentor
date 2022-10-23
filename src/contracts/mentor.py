@@ -4,8 +4,7 @@ class Mentor:
 
     class Variables:
         expertise = Bytes("EXPERTISE") #byte
-        description = Bytes("DESCRIPTION") #byte
-        image = Bytes("IMAGE") #byte
+        description = Bytes("DESCRIPTION") #byteyte
         price = Bytes("PRICE") # uint64
         avg_rating = Bytes("AVGRATING") #uint64
         num_of_raters = Bytes("NUMOFRATERS") #uint64
@@ -17,18 +16,18 @@ class Mentor:
         buy = Bytes("buy")
         support = Bytes("support")
         rate = Bytes("rate")
+        changeprice = Bytes("changeprice")
 
     def application_creation(self):
         return Seq([
-            Assert(Txn.application_args.length() == Int(4)),
-            Assert(Txn.note() == Bytes("mentorship:k2")),
+            Assert(Txn.application_args.length() == Int(3)),
+            Assert(Txn.note() == Bytes("mentorship:k3")),
 
             App.globalPut(self.Variables.expertise, Txn.application_args[0]),
             App.globalPut(self.Variables.description, Txn.application_args[1]),
-            App.globalPut(self.Variables.image, Txn.application_args[2]),
             App.globalPut(self.Variables.num_of_raters, Int(0)),
             App.globalPut(self.Variables.avg_rating, Int(0)),
-            App.globalPut(self.Variables.price, Btoi(Txn.application_args[3])),
+            App.globalPut(self.Variables.price, Btoi(Txn.application_args[2])),
             
             App.globalPut(self.Variables.total_rating, Int(0)),
             App.globalPut(self.Variables.buyers, Int(0)),
@@ -60,41 +59,14 @@ class Mentor:
 
         return If(can_buy).Then(update_state).Else(Reject())
 
-     
-    # funciton -> rate
-    def rate(self):
-        valid_number_of_transactions = Global.group_size() == Int(1)
-        # assert if user has bought the thing
-        rating = Btoi(Txn.application_args[1])
-        # Calculate and update the rating
-        total_rating = App.globalGet(self.Variables.total_rating)
-        numOfRators = App.globalGet(self.Variables.num_of_raters)
-
-        correctValue =  And(rating > Int(0),
-                            rating <= Int(5))
-
-        canRate = And(correctValue,
-                      valid_number_of_transactions)
-
-        #update state
-        update_state = Seq([
-            App.globalPut(self.Variables.num_of_raters, Btoi(numOfRators) + Int(1) ),
-            App.globalPut(self.Variables.total_rating, Btoi(total_rating) + rating),
-            App.globalPut(self.Variables.avg_rating,  
-                            Btoi(App.globalGet(self.Variables.total_rating)) / Btoi(self.Variables.num_of_raters)),
-            Approve()
-        ])
-        return If(canRate).Then(update_state).Else(Reject())
-
     # Function -> Support 
     def support(self):
         valid_number_of_transactions = Global.group_size() == Int(2)
-        amount = Btoi(Txn.application_args[1])
+        amount = Txn.application_args[1]
 
         valid_payment_to_seller = And(
             Gtxn[1].type_enum() == TxnType.Payment,
             Gtxn[1].receiver() == Global.creator_address(),
-            Gtxn[1].amount() == amount,
             Gtxn[1].sender() == Gtxn[0].sender(),
         )
 
@@ -102,11 +74,52 @@ class Mentor:
                         valid_payment_to_seller)
 
         update_state = Seq([
-            App.globalPut(self.Variables.amount_donated, Btoi(App.globalGet(self.Variables.amount_donated)) + amount),
+            App.globalPut(self.Variables.amount_donated, App.globalGet(self.Variables.amount_donated) + Btoi(amount)),
             Approve()
         ])
 
         return If(canDonate).Then(update_state).Else(Reject())
+     
+    # funciton -> rate
+    def rate(self):
+        valid_number_of_transactions = Global.group_size() == Int(2)
+        # assert if user has bought the thing
+        rating = Txn.application_args[1]
+
+
+        correctValue =  And(Btoi(rating) > Int(0),
+                            Btoi(rating) <= Int(5))
+
+        canRate = And(correctValue,
+                      valid_number_of_transactions)
+
+        #update state
+        update_state = Seq([
+            App.globalPut(self.Variables.num_of_raters, App.globalGet(self.Variables.num_of_raters) + Int(1) ),
+            App.globalPut(self.Variables.total_rating, App.globalGet(self.Variables.total_rating) + Btoi(rating)),
+            App.globalPut(self.Variables.avg_rating,  
+                            App.globalGet(self.Variables.total_rating) / App.globalGet(self.Variables.num_of_raters)),
+            Approve()
+        ])
+        return If(canRate).Then(update_state).Else(Reject())
+
+    def changePrice(self):
+
+        canChange = And(
+            Global.group_size() == Int(2),
+            Txn.sender() == Global.creator_address()
+        )
+
+        newPrice = Txn.application_args[1]
+
+        update_state = Seq([
+            App.globalPut(App.globalGet(self.Variables.price),Btoi(newPrice)),
+            Approve()
+        ])
+
+        return If(canChange).Then(update_state).Else(Reject())
+
+
 
 
     def application_deletion(self):

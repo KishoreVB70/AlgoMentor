@@ -3,7 +3,7 @@ import {toast} from "react-toastify";
 import AddMentor from "./AddMentor";
 import Loader from "../utils/Loader";
 import {NotificationError, NotificationSuccess} from "../utils/Notifications";
-import {buyMentorAction, createMentorAction, deleteMentorAction, getMentorAction,} from "../../utils/marketplace";
+import {buyMentorAction, createMentorAction, deleteMentorAction, getMentorAction, rateMentorAction} from "../../utils/marketplace";
 import PropTypes from "prop-types";
 import Mentor from "./Mentor";
 import NewMentor from "./NewMentor";
@@ -50,18 +50,34 @@ const ScrollMentor = ({address, fetchBalance}) => {
             })
     };
 
-    const buyMentor = async (product, count) => {
+    const buyMentor = async (mentor, count) => {
 	    setLoading(true);
-        console.log(product);
-	    buyMentorAction(address, product, count)
+        console.log(mentor);
+	    buyMentorAction(address, mentor, count)
 	        .then(() => {
-	            toast(<NotificationSuccess text="Product bought successfully"/>);
+	            toast(<NotificationSuccess text="Mentor bought successfully"/>);
 	            getMentors();
 	            fetchBalance(address);
 	        })
 	        .catch(error => {
 	            console.log(error)
-	            toast(<NotificationError text="Failed to purchase product."/>);
+	            toast(<NotificationError text="Failed to purchase mentor."/>);
+	            setLoading(false);
+	        })
+	};
+
+    const rateMentor = async (mentor, rating) => {
+	    setLoading(true);
+        console.log(mentor);
+	    rateMentorAction(address, mentor, rating)
+	        .then(() => {
+	            toast(<NotificationSuccess text="Mentor Rated successfully"/>);
+	            getMentors();
+	            fetchBalance(address);
+	        })
+	        .catch(error => {
+	            console.log(error)
+	            toast(<NotificationError text="Failed to Rate mentor."/>);
 	            setLoading(false);
 	        })
 	};
@@ -97,6 +113,7 @@ const ScrollMentor = ({address, fetchBalance}) => {
 	                        mentor={mentor}
 	                        buyMentor={buyMentor}
 	                        deleteMentor={deleteMentor}
+                            rateMentor={rateMentor}
 	                        key={index}
 	                    />
 	                ))}

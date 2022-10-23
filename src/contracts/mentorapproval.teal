@@ -31,11 +31,6 @@ gtxn 1 Receiver
 global CreatorAddress
 ==
 &&
-gtxn 1 Amount
-txna ApplicationArgs 1
-btoi
-==
-&&
 gtxn 1 Sender
 gtxn 0 Sender
 ==
@@ -48,7 +43,6 @@ main_l8:
 byte "AMOUNTDONATED"
 byte "AMOUNTDONATED"
 app_global_get
-btoi
 txna ApplicationArgs 1
 btoi
 +
@@ -66,7 +60,7 @@ int 5
 <=
 &&
 global GroupSize
-int 1
+int 2
 ==
 &&
 bnz main_l11
@@ -76,14 +70,12 @@ main_l11:
 byte "NUMOFRATERS"
 byte "NUMOFRATERS"
 app_global_get
-btoi
 int 1
 +
 app_global_put
 byte "TOTALRATING"
 byte "TOTALRATING"
 app_global_get
-btoi
 txna ApplicationArgs 1
 btoi
 +
@@ -91,9 +83,8 @@ app_global_put
 byte "AVGRATING"
 byte "TOTALRATING"
 app_global_get
-btoi
 byte "NUMOFRATERS"
-btoi
+app_global_get
 /
 app_global_put
 int 1
@@ -145,11 +136,11 @@ global CreatorAddress
 return
 main_l16:
 txn NumAppArgs
-int 4
+int 3
 ==
 assert
 txn Note
-byte "mentorship:k2"
+byte "mentorship:k3"
 ==
 assert
 byte "EXPERTISE"
@@ -158,9 +149,6 @@ app_global_put
 byte "DESCRIPTION"
 txna ApplicationArgs 1
 app_global_put
-byte "IMAGE"
-txna ApplicationArgs 2
-app_global_put
 byte "NUMOFRATERS"
 int 0
 app_global_put
@@ -168,7 +156,7 @@ byte "AVGRATING"
 int 0
 app_global_put
 byte "PRICE"
-txna ApplicationArgs 3
+txna ApplicationArgs 2
 btoi
 app_global_put
 byte "TOTALRATING"

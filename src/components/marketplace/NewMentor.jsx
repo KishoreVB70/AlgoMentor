@@ -5,12 +5,13 @@ import Dropdown from 'react-bootstrap/Dropdown';
 import {microAlgosToString, truncateAddress} from "../../utils/conversions";
 import Identicon from "../utils/Identicon";
 
-const NewMentor = ({address, mentor, buyMentor, deleteMentor}) => {
+const NewMentor = ({address, mentor, buyMentor, deleteMentor, rateMentor}) => {
     const {expertise, description, price, avgrating, numofraters, totalrating, buyers, amountdonated, appId, owner} =
         mentor;
 
     const [hours, setHours] = useState("")
     const [changePrice, setChangePrice] = useState("")
+    const [supportAmount, setSupportAmount] = useState("")
 
     return (
         <div className="indvmentor">
@@ -49,16 +50,20 @@ const NewMentor = ({address, mentor, buyMentor, deleteMentor}) => {
                             <input placeholder="Hours" type="number" value={hours} onChange = { (e) => setHours(e.target.value) } />
                             <button className='newbtn' onClick = {() => buyMentor(mentor, hours)}> Buy for {microAlgosToString(price) * hours} Algo</button>
                         </div>
+                        <div>
+                            <input placeholder="Amount" type="number" value={hours} onChange = { (e) => setHours(e.target.value) } />
+                            <button className='newbtn' onClick = {() => buyMentor(mentor, hours)}> Buy for {microAlgosToString(price) * hours} Algo</button>
+                        </div>
                         <Dropdown>
                             <Dropdown.Toggle variant="success" id="dropdown-basic">
                                 Rate Mentor
                             </Dropdown.Toggle>
                             <Dropdown.Menu>
-                                <Dropdown.Item >1</Dropdown.Item>
-                                <Dropdown.Item >2</Dropdown.Item>
-                                <Dropdown.Item >3</Dropdown.Item>
-                                <Dropdown.Item >4</Dropdown.Item>
-                                <Dropdown.Item >5</Dropdown.Item>
+                                <Dropdown.Item onClick={() => rateMentor(mentor,1)}>1</Dropdown.Item>
+                                <Dropdown.Item onClick={() => rateMentor(mentor,2)}>2</Dropdown.Item>
+                                <Dropdown.Item onClick={() => rateMentor(mentor,3)}>3</Dropdown.Item>
+                                <Dropdown.Item onClick={() => rateMentor(mentor,4)}>4</Dropdown.Item>
+                                <Dropdown.Item onClick={() => rateMentor(mentor,5)}>5</Dropdown.Item>
                             </Dropdown.Menu>
                         </Dropdown>   
                     </>

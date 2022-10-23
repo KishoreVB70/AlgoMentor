@@ -21,10 +21,9 @@ import clearProgram from "!!raw-loader!../contracts/mentorclear.teal";
 
 class Mentor {
     
-    constructor(expertise, description, image, price, avgrating, numofraters, totalrating, buyers, amountdonated, appId, owner) {
+    constructor(expertise, description, price, avgrating, numofraters, totalrating, buyers, amountdonated, appId, owner) {
         this.expertise = expertise;
         this.description = description;
-        this.image = image;
         this.price = price;
         this.avgrating = avgrating;
         this.numofraters = numofraters;
@@ -60,13 +59,10 @@ export const createMentorAction = async (senderAddress, mentor) => {
     let note = new TextEncoder().encode(mentorNote);
     let expertise = new TextEncoder().encode(mentor.expertise);
     let description = new TextEncoder().encode(mentor.description);
-    console.log(mentor.image);
-    let image = new TextEncoder().encode(mentor.image);
-    console.log(image);
     let price = algosdk.encodeUint64(mentor.price);
 
 
-    let appArgs = [expertise, description, image, price]
+    let appArgs = [expertise, description,price]
 
     // Create ApplicationCreateTxn
     let txn = algosdk.makeApplicationCreateTxnFromObject({
@@ -153,6 +149,56 @@ export const buyMentorAction = async (senderAddress, mentor, hours) => {
     console.log("Group transaction " + tx.txId + " confirmed in round " + confirmedTxn["confirmed-round"]);
 }
 
+// RATE Mentor: Group transaction consisting of ApplicationCallTxn and PaymentTxn
+export const rateMentorAction = async (senderAddress, mentor, rate) => {
+    console.log("Rate property...");
+  
+    let params = await algodClient.getTransactionParams().do();
+  
+    // Build required app args as Uint8Array
+    let rateArg = new TextEncoder().encode("rate");
+    console.log(rate);
+    let ratingArg = algosdk.encodeUint64(rate);
+    console.log(ratingArg);
+  
+    let appArgs = [rateArg, ratingArg];
+  
+    // Create ApplicationCallTxn
+    let appCallTxn = algosdk.makeApplicationCallTxnFromObject({
+      from: senderAddress,
+      appIndex: mentor.appId,
+      onComplete: algosdk.OnApplicationComplete.NoOpOC,
+      suggestedParams: params,
+      appArgs: appArgs,
+    });
+  
+    let txnArray = [appCallTxn];
+  
+    // Create group transaction out of previously build transactions
+    let groupID = algosdk.computeGroupID(txnArray);
+    for (let i = 0; i < 1; i++) txnArray[i].group = groupID;
+  
+    // Sign & submit the group transaction
+    let signedTxn = await myAlgoConnect.signTransaction(
+      txnArray.map((txn) => txn.toByte())
+    );
+    console.log("Signed group transaction");
+    let tx = await algodClient
+      .sendRawTransaction(signedTxn.map((txn) => txn.blob))
+      .do();
+  
+    // Wait for group transaction to be confirmed
+    let confirmedTxn = await algosdk.waitForConfirmation(algodClient, tx.txId, 4);
+  
+    // Notify about completion
+    console.log(
+      "Group transaction " +
+        tx.txId +
+        " confirmed in round " +
+        confirmedTxn["confirmed-round"]
+    );
+  };
+  
 export const supportMentorAction = async (senderAddress, mentor, amount) => {
 
     let params = await algodClient.getTransactionParams().do();
@@ -199,53 +245,7 @@ export const supportMentorAction = async (senderAddress, mentor, amount) => {
     console.log("Group transaction " + tx.txId + " confirmed in round " + confirmedTxn["confirmed-round"]);
 }
 
-// RATE PRODUCT: Group transaction consisting of ApplicationCallTxn and PaymentTxn
-export const rateMentorAction = async (senderAddress, mentor, rate) => {
-    console.log("Rate property...");
-  
-    let params = await algodClient.getTransactionParams().do();
-  
-    // Build required app args as Uint8Array
-    let rateArg = new TextEncoder().encode("rate");
-    let ratingArg = algosdk.encodeUint64(rate);
-  
-    let appArgs = [rateArg, ratingArg];
-  
-    // Create ApplicationCallTxn
-    let appCallTxn = algosdk.makeApplicationCallTxnFromObject({
-      from: senderAddress,
-      appIndex: mentor.appId,
-      onComplete: algosdk.OnApplicationComplete.NoOpOC,
-      suggestedParams: params,
-      appArgs: appArgs,
-    });
-  
-    let txnArray = [appCallTxn];
-  
-    // Create group transaction out of previously build transactions
-    let groupID = algosdk.computeGroupID(txnArray);
-    for (let i = 0; i < 1; i++) txnArray[i].group = groupID;
-  
-    // Sign & submit the group transaction
-    let signedTxn = await myAlgoConnect.signTransaction(
-      txnArray.map((txn) => txn.toByte())
-    );
-    console.log("Signed group transaction");
-    let tx = await algodClient
-      .sendRawTransaction(signedTxn.map((txn) => txn.blob))
-      .do();
-  
-    // Wait for group transaction to be confirmed
-    let confirmedTxn = await algosdk.waitForConfirmation(algodClient, tx.txId, 4);
-  
-    // Notify about completion
-    console.log(
-      "Group transaction " +
-        tx.txId +
-        " confirmed in round " +
-        confirmedTxn["confirmed-round"]
-    );
-  };
+
 export const deleteMentorAction = async (senderAddress, index) => {
     console.log("Deleting application...");
 
@@ -320,7 +320,6 @@ const getApplication = async (appId) => {
         let owner = response.application.params.creator
         let expertise = ""
         let description = ""
-        let image = ""
         let price = 0
         let buyers = 0
         let totalrating = 0
@@ -342,11 +341,6 @@ const getApplication = async (appId) => {
         if (getField("DESCRIPTION", globalState) !== undefined) {
             let field = getField("DESCRIPTION", globalState).value.bytes
             description = base64ToUTF8String(field)
-        }
-
-        if (getField("IMAGE", globalState) !== undefined) {
-            let field = getField("IMAGE", globalState).value.bytes
-            image = base64ToUTF8String(field)
         }
 
         if (getField("PRICE", globalState) !== undefined) {
@@ -373,7 +367,7 @@ const getApplication = async (appId) => {
             totalrating = getField("TOTALRATING", globalState).value.uint
         }
 
-        return new Mentor(expertise, description, image, price, avgrating, numberofraters, totalrating, buyers,amountdonated, appId, owner)
+        return new Mentor(expertise, description,price, avgrating, numberofraters, totalrating, buyers,amountdonated, appId, owner)
     } catch (err) {
         return null;
     }

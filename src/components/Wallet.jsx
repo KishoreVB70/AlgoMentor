@@ -21,7 +21,7 @@ const Wallet = ({address, name, amount, symbol, disconnect}) => {
                     ) : (
                         <Spinner animation="border" size="sm" className="opacity-25"/>
                     )}
-                    <Identicon address={address} size={28} className="ms-2 me-1"/>
+                    {/* <p>{name}</p> */}
                 </Dropdown.Toggle>
 
                 <Dropdown.Menu className="shadow-lg border-0">

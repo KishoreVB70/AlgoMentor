@@ -36,3 +36,14 @@
     transform: rotate(360deg);
   }
 }
+
+.titlediv{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 10vh;
+  width: 100%;
+  background-color: black;
+  color: white;
+  position: absolute;
+}

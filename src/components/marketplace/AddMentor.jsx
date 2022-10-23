@@ -3,6 +3,8 @@ import PropTypes from "prop-types";
 import {Button, FloatingLabel, Form, Modal} from "react-bootstrap";
 import {stringToMicroAlgos} from "../../utils/conversions";
 
+import "../../mentor.css"
+
 const AddMentor = ({createMentor}) => {
     const [expertise, setName] = useState("");
     const [description, setDescription] = useState("");
@@ -23,7 +25,7 @@ const AddMentor = ({createMentor}) => {
             <Button
                 onClick={handleShow}
                 variant="dark"
-                className="rounded-pill px-0"
+                className="addbtn"
                 style={{width: "150px"}}
             >
                 <p>Add Mentor</p>

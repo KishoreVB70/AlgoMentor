@@ -60,6 +60,7 @@ export const createMentorAction = async (senderAddress, mentor) => {
     let note = new TextEncoder().encode(mentorNote);
     let expertise = new TextEncoder().encode(mentor.expertise);
     let description = new TextEncoder().encode(mentor.description);
+    console.log(mentor.image);
     let image = new TextEncoder().encode(mentor.image);
     console.log(image);
     let price = algosdk.encodeUint64(mentor.price);
@@ -151,6 +152,100 @@ export const buyMentorAction = async (senderAddress, mentor, hours) => {
     // Notify about completion
     console.log("Group transaction " + tx.txId + " confirmed in round " + confirmedTxn["confirmed-round"]);
 }
+
+export const supportMentorAction = async (senderAddress, mentor, amount) => {
+
+    let params = await algodClient.getTransactionParams().do();
+    params.fee = algosdk.ALGORAND_MIN_TX_FEE;
+    params.flatFee = true;
+
+    // Build required app args as Uint8Array
+    let supportArg = new TextEncoder().encode("support")
+    let amountArg = algosdk.encodeUint64(amount);
+    let appArgs = [supportArg, amountArg]
+
+    // Create ApplicationCallTxn
+    let appCallTxn = algosdk.makeApplicationCallTxnFromObject({
+        from: senderAddress,
+        appIndex: mentor.appId,
+        onComplete: algosdk.OnApplicationComplete.NoOpOC,
+        suggestedParams: params,
+        appArgs: appArgs
+    })
+
+    // Create PaymentTxn
+    let paymentTxn = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
+        from: senderAddress,
+        to: mentor.owner,
+        amount: amount,
+        suggestedParams: params
+    })
+
+    let txnArray = [appCallTxn, paymentTxn]
+
+    // Create group transaction out of previously build transactions
+    let groupID = algosdk.computeGroupID(txnArray)
+    for (let i = 0; i < 2; i++) txnArray[i].group = groupID;
+
+    // Sign & submit the group transaction
+    let signedTxn = await myAlgoConnect.signTransaction(txnArray.map(txn => txn.toByte()));
+    console.log("Signed group transaction");
+    let tx = await algodClient.sendRawTransaction(signedTxn.map(txn => txn.blob)).do();
+
+    // Wait for group transaction to be confirmed
+    let confirmedTxn = await algosdk.waitForConfirmation(algodClient, tx.txId, 4);
+
+    // Notify about completion
+    console.log("Group transaction " + tx.txId + " confirmed in round " + confirmedTxn["confirmed-round"]);
+}
+
+// RATE PRODUCT: Group transaction consisting of ApplicationCallTxn and PaymentTxn
+export const rateMentorAction = async (senderAddress, mentor, rate) => {
+    console.log("Rate property...");
+  
+    let params = await algodClient.getTransactionParams().do();
+  
+    // Build required app args as Uint8Array
+    let rateArg = new TextEncoder().encode("rate");
+    let ratingArg = algosdk.encodeUint64(rate);
+  
+    let appArgs = [rateArg, ratingArg];
+  
+    // Create ApplicationCallTxn
+    let appCallTxn = algosdk.makeApplicationCallTxnFromObject({
+      from: senderAddress,
+      appIndex: mentor.appId,
+      onComplete: algosdk.OnApplicationComplete.NoOpOC,
+      suggestedParams: params,
+      appArgs: appArgs,
+    });
+  
+    let txnArray = [appCallTxn];
+  
+    // Create group transaction out of previously build transactions
+    let groupID = algosdk.computeGroupID(txnArray);
+    for (let i = 0; i < 1; i++) txnArray[i].group = groupID;
+  
+    // Sign & submit the group transaction
+    let signedTxn = await myAlgoConnect.signTransaction(
+      txnArray.map((txn) => txn.toByte())
+    );
+    console.log("Signed group transaction");
+    let tx = await algodClient
+      .sendRawTransaction(signedTxn.map((txn) => txn.blob))
+      .do();
+  
+    // Wait for group transaction to be confirmed
+    let confirmedTxn = await algosdk.waitForConfirmation(algodClient, tx.txId, 4);
+  
+    // Notify about completion
+    console.log(
+      "Group transaction " +
+        tx.txId +
+        " confirmed in round " +
+        confirmedTxn["confirmed-round"]
+    );
+  };
 export const deleteMentorAction = async (senderAddress, index) => {
     console.log("Deleting application...");
 
@@ -182,6 +277,8 @@ export const deleteMentorAction = async (senderAddress, index) => {
     let appId = transactionResponse['txn']['txn'].apid;
     console.log("Deleted app-id: ", appId);
 }
+
+
 // GET PRODUCTS: Use indexer
 export const getMentorAction = async () => {
     console.log("Fetching products...")

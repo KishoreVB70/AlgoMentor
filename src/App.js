@@ -1,16 +1,18 @@
 import React, {useState} from "react";
-import './App.css';
 
-import Cover from "./components/Cover";
+//Styles
 import './App.css';
-import Wallet from "./components/Wallet";
 import {Container, Nav} from "react-bootstrap";
-// import Products from "./components/marketplace/Products";
-// import {Notification} from "./components/utils/Notifications";
-import {indexerClient, myAlgoConnect} from "./utils/constants";
 import coverImg from "./assets/mentor.jpg"
-import Products from "./components/marketplace/Products"
-import { Notification } from "./components/utils/Notifications";
+
+import {indexerClient, myAlgoConnect} from "./utils/constants";
+
+//Components
+import Cover from "./components/Cover";
+import Wallet from "./components/Wallet";
+import {Notification} from "./components/utils/Notifications";
+import Mentors from "./components/marketplace/Mentors"
+import ScrollMentor from "./components/marketplace/ScrollMentor"
 
 const App = function AppWrapper() {
     const [address, setAddress] = useState(null);
@@ -51,22 +53,29 @@ const App = function AppWrapper() {
         <>
             <Notification />
             {address ? (
-                <Container fluid="md">
-                    <Nav className="justify-content-end pt-3 pb-5">
-                        <Nav.Item>
-                            <Wallet
-                                address={address}
-                                name={name}
-                                amount={balance}
-                                disconnect={disconnect}
-                                symbol={"ALGO"}
-                            />
-                        </Nav.Item>
-                    </Nav>
-                    <main>
-                        <Products address={address} fetchBalance={fetchBalance}/>
-                    </main>
-                </Container>
+                <>
+                    <div className="titlediv" >
+                        <h1>
+                            Algo Mentorship
+                        </h1>
+                    </div>    
+                    <Container fluid="md">
+                        <Nav className="justify-content-end pt-3 pb-5">
+                            <Nav.Item>
+                                <Wallet
+                                    address={address}
+                                    name={name}
+                                    amount={balance}
+                                    disconnect={disconnect}
+                                    symbol={"ALGO"}
+                                    />
+                            </Nav.Item>
+                        </Nav>
+                        <main>
+                            <ScrollMentor address={address} fetchBalance={fetchBalance}/>
+                        </main>
+                    </Container>
+                </>
             ) : (
                 <Cover name={"Algo Mentor"} coverImg={coverImg} connect={connectWallet}/>
             )}

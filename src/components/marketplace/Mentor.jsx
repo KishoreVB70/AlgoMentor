@@ -1,113 +1,104 @@
 import React, {useState} from "react";
 import PropTypes from "prop-types";
-import {Badge, Button, Card, Col, FloatingLabel, Form, Stack} from "react-bootstrap";
+import {Button} from "react-bootstrap";
 import Dropdown from 'react-bootstrap/Dropdown';
-import {microAlgosToString, truncateAddress} from "../../utils/conversions";
-import Identicon from "../utils/Identicon";
+import {microAlgosToString, stringToMicroAlgos,  truncateAddress} from "../../utils/conversions";
 
-const Mentor = ({address, mentor, buyMentor, deleteMentor}) => {
-    const {expertise, description, image, price, avgrating, numofraters, totalrating, buyers, amountdonated, appId, owner} =
+const Mentor = ({address, mentor, buyMentor, deleteMentor, rateMentor, changePrice, supportMentor, optInToApp}) => {
+    const {expertise, description, price, avgrating, numofraters,buyers, amountdonated, owner} =
         mentor;
 
-    const [hours, setHours] = useState(1)
-    const [changePrice, setChangePrice] = useState(1)
+    let intAmount;
+    if(amountdonated > 0){
+        intAmount = parseInt(microAlgosToString(amountdonated));
+    }else{
+        intAmount = amountdonated;
+    }
+    
+    const [hours, setHours] = useState("")
+    const [currentChangePrice, setChangePrice] = useState("")
+    const [supportAmount, setSupportAmount] = useState("")
 
     return (
-        <Col key={appId}>
-            <Card className="h-100">
-                <Card.Header>
-                    <Stack direction="horizontal" gap={2}>
-                        <span className="font-monospace text-secondary">{truncateAddress(owner)}</span>
-                        <Identicon size={28} address={owner}/>
-                        <Badge bg="secondary" className="ms-auto">
-                            {buyers} Bought
-                        </Badge>
-                    </Stack>
-                </Card.Header>
-                <div className="ratio ratio-4x3">
-                    <img src={image} alt={expertise} style={{objectFit: "cover"}}/>
+        <div className="indvmentor">
+            <div className="topdiv">
+                <span className="font-monospace text-secondary">{truncateAddress(owner)}</span>
+                <p>Price: {microAlgosToString(price) * 1} Algo</p>
+            </div>
+            <div className="flexguys">
+                <h2>{expertise}</h2>
+                <p>{description}</p>
+                <div className="details">
+                    <p>Bought: {buyers}</p>
+                    <p>Rating: {avgrating}/5</p>
+                    <p>Raters: {numofraters}</p>
                 </div>
-                <Card.Body className="d-flex flex-column text-center">
-                    <Card.Title>{expertise}</Card.Title>
-                    <Card.Text className="flex-grow-1">{description}</Card.Text>
-                    <Form className="d-flex align-content-stretch flex-row gap-2">
-                        {mentor.owner !== address &&
-                            <>
-                                <Dropdown>
-                                    <Dropdown.Toggle variant="success" id="dropdown-basic">
-                                        Rate
-                                    </Dropdown.Toggle>
-
-                                    <Dropdown.Menu>
-                                        <Dropdown.Item >1</Dropdown.Item>
-                                        <Dropdown.Item >2</Dropdown.Item>
-                                        <Dropdown.Item >3</Dropdown.Item>
-                                        <Dropdown.Item >4</Dropdown.Item>
-                                        <Dropdown.Item >5</Dropdown.Item>
-                                    </Dropdown.Menu>
-                                </Dropdown>
-                                <FloatingLabel
-                                    controlId="inputhours"
-                                    label="hours"
-                                    className="w-25"
-                                >
-                                    <Form.Control
-                                        type="number"
-                                        value={hours}
-                                        min="1"
-                                        max="10"
-                                        onChange={(e) => {
-                                            setHours(Number(e.target.value));
-                                        }}
-                                    />
-                                </FloatingLabel>
-                                <Button
-                                    variant="outline-dark"
-                                    onClick={() => buyMentor(mentor, hours)}
-                                    className="w-75 py-3"
-                                    >
-                                    Buy for {microAlgosToString(price) * hours} ALGO
-                                </Button>
-                            </>
-                        }
-                        {mentor.owner === address &&
-                            <>
-                                <Button
+                    <p>Amount Donated: {intAmount} Algo</p>
+                {mentor.owner === address && 
+                    <>   
+                        <div className="input">
+                            <input placeholder="new price" type="number" value={currentChangePrice} onChange = { (e) => setChangePrice(e.target.value) } />
+                            <button className='newbtn' onClick = {() => changePrice(mentor, currentChangePrice)}> Change Price </button>
+                        </div>
+                        <Button
                                     variant="outline-danger"
                                     onClick={() => deleteMentor(mentor)}
                                     className="btn"
                                     >
-                                    <i className="bi bi-trash"></i>
+                                    Delete
                                 </Button>
 
-                                <FloatingLabel
-                                    controlId="inputprice"
-                                    label="Price"
-                                    className="w-25"
-                                    >
-                                    <Form.Control
-                                        type="number"
-                                        value={changePrice}
-                                        min="1"
-                                        max="20"
-                                        onChange={(e) => {
-                                            setChangePrice(Number(e.target.value));
-                                        }}
-                                    />
-                                </FloatingLabel>
-                                <Button
-                                    variant="outline-dark"
-                                    onClick={() => console.log("clicked")}
-                                    className="w-75 py-3"
-                                    >
-                                    Change price to {changePrice} Algo
-                                </Button>
+                    </>
+                }
+                {mentor.owner !== address &&
+                    <>
+                        {mentor.hasopt === 0 && 
+                            <>
+                                <button onClick={() => optInToApp(mentor)} >Opt in to buy</button>
                             </>
                         }
-                    </Form>
-                </Card.Body>
-            </Card>
-        </Col>
+                        {mentor.hasopt === 1 && 
+                            <>
+                                <div className="input">
+                                    <input placeholder="Hours" type="number" value={hours} onChange = { (e) => setHours(e.target.value) } />
+                                    <button className='newbtn' onClick = {() => buyMentor(mentor, hours)}> Buy for {microAlgosToString(price) * hours} Algo</button>
+                                </div>
+                            </>
+                        }
+                        <div className="input">
+                            <input placeholder="Amount" type="number" value={supportAmount} onChange = { (e) => setSupportAmount(e.target.value) } />
+                            <button className='newbtn' onClick = {() => supportMentor(mentor, stringToMicroAlgos(supportAmount))}> Support Mentor</button>
+                        </div>
+                        {mentor.hasbought === 0 && 
+                        <>
+                            <button className="ratebtn">Buy to rate</button>
+                        </>
+                        }
+                        {mentor.hasrated === 1 &&
+                        <>
+                            <button className="ratebtn" >Already Rated</button>
+                        </>
+                        }
+                        {mentor.hasbought === 1 && mentor.hasrated === 0 &&
+                        <>
+                            <Dropdown>
+                                <Dropdown.Toggle variant="success" id="dropdown-basic">
+                                    Rate Mentor
+                                </Dropdown.Toggle>
+                                <Dropdown.Menu>
+                                    <Dropdown.Item onClick={() => rateMentor(mentor,1)}>1</Dropdown.Item>
+                                    <Dropdown.Item onClick={() => rateMentor(mentor,2)}>2</Dropdown.Item>
+                                    <Dropdown.Item onClick={() => rateMentor(mentor,3)}>3</Dropdown.Item>
+                                    <Dropdown.Item onClick={() => rateMentor(mentor,4)}>4</Dropdown.Item>
+                                    <Dropdown.Item onClick={() => rateMentor(mentor,5)}>5</Dropdown.Item>
+                                </Dropdown.Menu>
+                            </Dropdown>   
+                        </>
+                        }
+                    </>
+                }
+            </div>
+        </div>
     );
 };
 
@@ -118,4 +109,4 @@ Mentor.propTypes = {
     deleteMentor: PropTypes.func.isRequired
 };
 
-export default Mentor;
+export default Mentor

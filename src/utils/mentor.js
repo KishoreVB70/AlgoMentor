@@ -17,7 +17,7 @@ import {
 /* eslint import/no-webpack-loader-syntax: off */
 import approvalProgram from "!!raw-loader!../contracts/mentorapproval.teal";
 import clearProgram from "!!raw-loader!../contracts/mentorclear.teal";
-import { stringToMicroAlgos, microAlgosToString } from "./conversions";
+import { stringToMicroAlgos } from "./conversions";
 
 
 class Mentor {
@@ -106,7 +106,6 @@ export const createMentorAction = async (senderAddress, mentor) => {
 
 export const optInAction = async (senderAddress, appId) => {
     let accountInfo = await indexerClient.lookupAccountByID(senderAddress).do();
-    console.log(accountInfo);
     let optInApps  = accountInfo.account["apps-local-state"];
     if(optInApps.find(app => app.id === appId) !== undefined){
         return;
@@ -187,9 +186,7 @@ export const rateMentorAction = async (senderAddress, mentor, rate) => {
   
     // Build required app args as Uint8Array
     let rateArg = new TextEncoder().encode("rate");
-    console.log(rate);
     let ratingArg = algosdk.encodeUint64(parseInt(rate));
-    console.log(ratingArg);
   
     let appArgs = [rateArg, ratingArg];
   
@@ -280,7 +277,6 @@ export const supportMentorAction = async (senderAddress, mentor, amount) => {
     let actualAmount = parseInt(amount)
     // Build required app args as Uint8Array
     let supportArg = new TextEncoder().encode("support")
-    console.log(amount)
     let amountArg = algosdk.encodeUint64(actualAmount);
     let appArgs = [supportArg, amountArg]
 
@@ -355,7 +351,6 @@ export const deleteMentorAction = async (senderAddress, index) => {
 
 // GET PRODUCTS: Use indexer
 export const getMentorAction = async (address) => {
-    console.log("Fetching products...")
     let note = new TextEncoder().encode(mentorNote);
     let encodedNote = Buffer.from(note).toString("base64");
 
@@ -373,11 +368,9 @@ export const getMentorAction = async (address) => {
             let mentor = await getApplication(appId, address)
             if (mentor) {
                 products.push(mentor)
-                console.log(mentor)
             }
         }
     }
-    console.log("Products fetched.")
     return products
 }
 

@@ -11,7 +11,7 @@ import {indexerClient, myAlgoConnect} from "./utils/constants";
 import Cover from "./components/Cover";
 import Wallet from "./components/Wallet";
 import {Notification} from "./components/utils/Notifications";
-import ScrollMentor from "./components/marketplace/ScrollMentor"
+import Mentors from "./components/marketplace/Mentors"
 
 const App = function AppWrapper() {
     const [address, setAddress] = useState(null);
@@ -71,7 +71,7 @@ const App = function AppWrapper() {
                             </Nav.Item>
                         </Nav>
                         <main>
-                            <ScrollMentor address={address} fetchBalance={fetchBalance}/>
+                            <Mentors address={address} fetchBalance={fetchBalance}/>
                         </main>
                     </Container>
                 </>

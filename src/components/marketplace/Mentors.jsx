@@ -3,10 +3,15 @@ import {toast} from "react-toastify";
 import AddMentor from "./AddMentor";
 import Loader from "../utils/Loader";
 import {NotificationError, NotificationSuccess} from "../utils/Notifications";
-import {buyMentorAction, createMentorAction, deleteMentorAction, getMentorAction,} from "../../utils/marketplace";
+import {
+			buyMentorAction, createMentorAction, 
+			deleteMentorAction, getMentorAction, 
+			rateMentorAction, changePriceAction, 
+			supportMentorAction, optInAction
+		} from "../../utils/mentor";
+
 import PropTypes from "prop-types";
-import {Row} from "react-bootstrap";
-import Mentor from "./Mentor";
+import NewMentor from "./Mentor";
 
 const Mentors = ({address, fetchBalance}) => {
     const [loading, setLoading] = useState(false);
@@ -15,7 +20,8 @@ const Mentors = ({address, fetchBalance}) => {
 
     const getMentors = async () => {
         setLoading(true);
-        getMentorAction()
+		toast(<NotificationSuccess text="Fetching mentors"/>);
+        getMentorAction(address)
             .then(mentors => {
                 if (mentors) {
                     setMentors(mentors);
@@ -26,6 +32,8 @@ const Mentors = ({address, fetchBalance}) => {
             })
             .finally(_ => {
                 setLoading(false);
+				toast(<NotificationSuccess text="Fetched mentors successfully"/>);
+
             });
         };
         
@@ -36,7 +44,6 @@ const Mentors = ({address, fetchBalance}) => {
 
     const createMentor = async (data) => {
         setLoading(true);
-        console.log(data)
         createMentorAction(address, data)
             .then(() => {
                 toast(<NotificationSuccess text="Mentor added successfully."/>);
@@ -50,17 +57,77 @@ const Mentors = ({address, fetchBalance}) => {
             })
     };
 
-    const buyMentor = async (product, count) => {
+    const buyMentor = async (mentor, count) => {
+		setLoading(true);
+		 buyMentorAction(address, mentor, count)
+		.then(() => {
+			toast(<NotificationSuccess text="Mentor bought successfully"/>);
+			getMentors();
+			fetchBalance(address);
+		})
+		.catch(error => {
+			console.log(error)
+			toast(<NotificationError text="Failed to purchase mentor."/>);
+			setLoading(false);
+		})
+	};
+
+    const optInToApp = async (mentor) => {
+		setLoading(true);
+		optInAction(address, mentor.appId)
+		.then(() => {
+			toast(<NotificationSuccess text="Opted in successfully"/>);
+			getMentors();
+			fetchBalance(address);
+		})
+		.catch(error => {
+			console.log(error)
+			toast(<NotificationError text="Failed to Opt into the application"/>);
+			setLoading(false);
+		})
+	};
+
+    const supportMentor = async (mentor, amount) => {
 	    setLoading(true);
-	    buyMentorAction(address, product, count)
+	    supportMentorAction(address, mentor, amount)
 	        .then(() => {
-	            toast(<NotificationSuccess text="Product bought successfully"/>);
+	            toast(<NotificationSuccess text="Mentor Supported successfully"/>);
 	            getMentors();
 	            fetchBalance(address);
 	        })
 	        .catch(error => {
 	            console.log(error)
-	            toast(<NotificationError text="Failed to purchase product."/>);
+	            toast(<NotificationError text="Failed to Support mentor."/>);
+	            setLoading(false);
+	        })
+	};
+
+    const rateMentor = async (mentor, rating) => {
+	    setLoading(true);
+	    rateMentorAction(address, mentor, rating)
+	        .then(() => {
+	            toast(<NotificationSuccess text="Mentor Rated successfully"/>);
+	            getMentors();
+	            fetchBalance(address);
+	        })
+	        .catch(error => {
+	            console.log(error)
+	            toast(<NotificationError text="Failed to Rate mentor."/>);
+	            setLoading(false);
+	        })
+	};
+
+    const changePrice = async (mentor, newPrice) => {
+	    setLoading(true);
+	    changePriceAction(address, mentor, newPrice)
+	        .then(() => {
+	            toast(<NotificationSuccess text="Changed price"/>);
+	            getMentors();
+	            fetchBalance(address);
+	        })
+	        .catch(error => {
+	            console.log(error)
+	            toast(<NotificationError text="Failed to Change price."/>);
 	            setLoading(false);
 	        })
 	};
@@ -88,19 +155,23 @@ const Mentors = ({address, fetchBalance}) => {
 	        <div>
 	            <AddMentor createMentor={createMentor}/>
 	        </div>
-	        <Row xs={1} sm={2} lg={3} className="g-3 mb-5 g-xl-4 g-xxl-5">
+	        <div className="mentors">
 	            <>
 	                {mentors.map((mentor, index) => (
-	                    <Mentor
+	                    <NewMentor
 	                        address={address}
 	                        mentor={mentor}
 	                        buyMentor={buyMentor}
 	                        deleteMentor={deleteMentor}
+                            rateMentor={rateMentor}
+                            changePrice={changePrice}
+                            supportMentor={supportMentor}
+							optInToApp={optInToApp}
 	                        key={index}
 	                    />
 	                ))}
 	            </>
-	        </Row>
+	        </div>
 	    </>
 	);
 };

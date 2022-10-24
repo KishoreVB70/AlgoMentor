@@ -11,7 +11,6 @@ import {indexerClient, myAlgoConnect} from "./utils/constants";
 import Cover from "./components/Cover";
 import Wallet from "./components/Wallet";
 import {Notification} from "./components/utils/Notifications";
-import Mentors from "./components/marketplace/Mentors"
 import ScrollMentor from "./components/marketplace/ScrollMentor"
 
 const App = function AppWrapper() {

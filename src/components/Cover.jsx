@@ -13,7 +13,7 @@ const Cover = ({name, coverImg, connect}) => {
                     <img src={coverImg} alt=""/>
                 </div>
                 <h1>{name}</h1>
-                <p>Please connect your wallet to continue.</p>
+                <p>Dapp to get mentorship from professionals</p>
                 <Button
                     onClick={() => connect()}
                     variant="outline-light"

@@ -7,7 +7,7 @@ import {
 			buyMentorAction, createMentorAction, 
 			deleteMentorAction, getMentorAction, 
 			rateMentorAction, changePriceAction, 
-			supportMentorAction, optIn
+			supportMentorAction, optInAction
 		} from "../../utils/marketplace";
 
 import PropTypes from "prop-types";
@@ -56,20 +56,35 @@ const ScrollMentor = ({address, fetchBalance}) => {
     };
 
     const buyMentor = async (mentor, count) => {
-		await optIn(address, mentor.appId);
-	    setLoading(true);
+		setLoading(true);
         console.log(mentor);
-	    buyMentorAction(address, mentor, count)
-	        .then(() => {
-	            toast(<NotificationSuccess text="Mentor bought successfully"/>);
-	            getMentors();
-	            fetchBalance(address);
-	        })
-	        .catch(error => {
-	            console.log(error)
-	            toast(<NotificationError text="Failed to purchase mentor."/>);
-	            setLoading(false);
-	        })
+		 buyMentorAction(address, mentor, count)
+		.then(() => {
+			toast(<NotificationSuccess text="Mentor bought successfully"/>);
+			getMentors();
+			fetchBalance(address);
+		})
+		.catch(error => {
+			console.log(error)
+			toast(<NotificationError text="Failed to purchase mentor."/>);
+			setLoading(false);
+		})
+	};
+
+    const optInToApp = async (mentor) => {
+		setLoading(true);
+        console.log(mentor);
+		optInAction(address, mentor.appId)
+		.then(() => {
+			toast(<NotificationSuccess text="Opted in successfully"/>);
+			getMentors();
+			fetchBalance(address);
+		})
+		.catch(error => {
+			console.log(error)
+			toast(<NotificationError text="Failed to Opt into the application"/>);
+			setLoading(false);
+		})
 	};
 
     const supportMentor = async (mentor, amount) => {
@@ -152,6 +167,7 @@ const ScrollMentor = ({address, fetchBalance}) => {
                             rateMentor={rateMentor}
                             changePrice={changePrice}
                             supportMentor={supportMentor}
+							optInToApp={optInToApp}
 	                        key={index}
 	                    />
 	                ))}

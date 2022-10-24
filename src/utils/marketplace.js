@@ -17,12 +17,12 @@ import {
 /* eslint import/no-webpack-loader-syntax: off */
 import approvalProgram from "!!raw-loader!../contracts/mentorapproval.teal";
 import clearProgram from "!!raw-loader!../contracts/mentorclear.teal";
-import { stringToMicroAlgos } from "./conversions";
+import { stringToMicroAlgos, microAlgosToString } from "./conversions";
 
 
 class Mentor {
     
-    constructor(expertise, description, price, avgrating, numofraters, totalrating, buyers,  amountdonated, hasbought, hasrated, appId, owner) {
+    constructor(expertise, description, price, avgrating, numofraters, totalrating, buyers,  amountdonated, hasbought, hasrated, hasopt, appId, owner) {
         this.expertise = expertise;
         this.description = description;
         this.price = price;
@@ -33,6 +33,7 @@ class Mentor {
         this.amountdonated = amountdonated;
         this.hasbought = hasbought;
         this.hasrated = hasrated;
+        this.hasopt = hasopt;
         this.appId = appId;
         this.owner = owner;
     }
@@ -103,7 +104,7 @@ export const createMentorAction = async (senderAddress, mentor) => {
     return appId;
 }
 
-export const optIn = async (senderAddress, appId) => {
+export const optInAction = async (senderAddress, appId) => {
     let accountInfo = await indexerClient.lookupAccountByID(senderAddress).do();
     console.log(accountInfo);
     let optInApps  = accountInfo.account["apps-local-state"];
@@ -401,6 +402,13 @@ const getApplication = async (appId, senderAddress) => {
         let avgrating = 0
         let hasrated = 0
         let hasbought = 0
+        let hasopt = 0
+
+        let accountInfo = await indexerClient.lookupAccountByID(senderAddress).do();
+        let optInApps  = accountInfo.account["apps-local-state"];
+        if(optInApps.find(app => app.id === appId) !== undefined){
+            hasopt = 1;
+        }
 
         const getField = (fieldName, globalState) => {
             return globalState.find(state => {
@@ -435,7 +443,7 @@ const getApplication = async (appId, senderAddress) => {
         }
 
         if (getField("AMOUNTDONATED", globalState) !== undefined) {
-            amountdonated = getField("AMOUNTDONATED", globalState).value.uint
+           amountdonated = getField("AMOUNTDONATED", globalState).value.uint
         }
 
         if (getField("TOTALRATING", globalState) !== undefined) {
@@ -458,7 +466,7 @@ const getApplication = async (appId, senderAddress) => {
           }
         }
 
-        return new Mentor(expertise, description,price, avgrating, numberofraters, totalrating, buyers,amountdonated, hasbought, hasrated, appId, owner)
+        return new Mentor(expertise, description,price, avgrating, numberofraters, totalrating, buyers,amountdonated, hasbought, hasrated, hasopt, appId, owner)
     } catch (err) {
         return null;
     }

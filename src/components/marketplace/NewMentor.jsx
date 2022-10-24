@@ -4,10 +4,17 @@ import {Button} from "react-bootstrap";
 import Dropdown from 'react-bootstrap/Dropdown';
 import {microAlgosToString, stringToMicroAlgos,  truncateAddress} from "../../utils/conversions";
 
-const NewMentor = ({address, mentor, buyMentor, deleteMentor, rateMentor, changePrice, supportMentor}) => {
+const NewMentor = ({address, mentor, buyMentor, deleteMentor, rateMentor, changePrice, supportMentor, optInToApp}) => {
     const {expertise, description, price, avgrating, numofraters,buyers, amountdonated, owner} =
         mentor;
 
+    let intAmount;
+    if(amountdonated > 0){
+        intAmount = parseInt(microAlgosToString(amountdonated));
+    }else{
+        intAmount = amountdonated;
+    }
+    
     const [hours, setHours] = useState("")
     const [currentChangePrice, setChangePrice] = useState("")
     const [supportAmount, setSupportAmount] = useState("")
@@ -26,10 +33,10 @@ const NewMentor = ({address, mentor, buyMentor, deleteMentor, rateMentor, change
                     <p>Rating: {avgrating}/5</p>
                     <p>Raters: {numofraters}</p>
                 </div>
-                    <p>Amount Donated: {microAlgosToString(amountdonated) * 1} Algo</p>
+                    <p>Amount Donated: {intAmount} Algo</p>
                 {mentor.owner === address && 
                     <>   
-                        <div className="edit">
+                        <div className="input">
                             <input placeholder="new price" type="number" value={currentChangePrice} onChange = { (e) => setChangePrice(e.target.value) } />
                             <button className='newbtn' onClick = {() => changePrice(mentor, currentChangePrice)}> Change Price </button>
                         </div>
@@ -45,11 +52,20 @@ const NewMentor = ({address, mentor, buyMentor, deleteMentor, rateMentor, change
                 }
                 {mentor.owner !== address &&
                     <>
-                        <div className="buy">
-                            <input placeholder="Hours" type="number" value={hours} onChange = { (e) => setHours(e.target.value) } />
-                            <button className='newbtn' onClick = {() => buyMentor(mentor, hours)}> Buy for {microAlgosToString(price) * hours} Algo</button>
-                        </div>
-                        <div>
+                        {mentor.hasopt === 0 && 
+                            <>
+                                <button onClick={() => optInToApp(mentor)} >Opt in to buy</button>
+                            </>
+                        }
+                        {mentor.hasopt === 1 && 
+                            <>
+                                <div className="input">
+                                    <input placeholder="Hours" type="number" value={hours} onChange = { (e) => setHours(e.target.value) } />
+                                    <button className='newbtn' onClick = {() => buyMentor(mentor, hours)}> Buy for {microAlgosToString(price) * hours} Algo</button>
+                                </div>
+                            </>
+                        }
+                        <div className="input">
                             <input placeholder="Amount" type="number" value={supportAmount} onChange = { (e) => setSupportAmount(e.target.value) } />
                             <button className='newbtn' onClick = {() => supportMentor(mentor, stringToMicroAlgos(supportAmount))}> Support Mentor</button>
                         </div>

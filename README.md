@@ -1,3 +1,13 @@
+# Algo Mentor
+- Dapp for user to meet mentors and buy mentorship from them
+### [Click here for live dapp]()
+### Features of the dapp
+- Buy mentorship based on hours
+- Rate the mentor 
+- Support the mentor in the form of algo donation
+- For mentor, price can be changed 
+
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).

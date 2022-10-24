@@ -5,7 +5,7 @@
 - Buy mentorship based on hours
 - Rate the mentor 
 - Support the mentor in the form of algo donation
-- For mentor, price can be changed 
+- Mentors can change their price accroding to the demand
 
 
 # Getting Started with Create React App

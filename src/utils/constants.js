@@ -22,14 +22,14 @@ export const ALGORAND_DECIMALS = 6;
 
 
 // https://github.com/algorandfoundation/ARCs/blob/main/ARCs/arc-0002.md
-export const mentorNote = "mentorship:k6"
+export const mentorNote = "mentorship:k9"
 
 // Maximum local storage allocation, immutable
-export const numLocalInts = 0;
+export const numLocalInts = 2;// Has liked, Has Bought
 export const numLocalBytes = 0;
 // Maximum global storage allocation, immutable
-export const numGlobalInts = 6; // Global variables stored as Int: count, sold
-export const numGlobalBytes = 2; // Global variables stored as Bytes: name, description, image
+export const numGlobalInts = 6; // 
+export const numGlobalBytes = 2; // 
 
 export const base64ToUTF8String = (base64String) => {
     return Buffer.from(base64String, 'base64').toString("utf-8")

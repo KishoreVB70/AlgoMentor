@@ -2,7 +2,7 @@ import React, {useState} from "react";
 import PropTypes from "prop-types";
 import {Button} from "react-bootstrap";
 import Dropdown from 'react-bootstrap/Dropdown';
-import {microAlgosToString, truncateAddress} from "../../utils/conversions";
+import {microAlgosToString, stringToMicroAlgos,  truncateAddress} from "../../utils/conversions";
 
 const NewMentor = ({address, mentor, buyMentor, deleteMentor, rateMentor, changePrice, supportMentor}) => {
     const {expertise, description, price, avgrating, numofraters,buyers, amountdonated, owner} =
@@ -23,10 +23,10 @@ const NewMentor = ({address, mentor, buyMentor, deleteMentor, rateMentor, change
                 <p>{description}</p>
                 <div className="details">
                     <p>Bought: {buyers}</p>
-                    <p>Rating: {avgrating}</p>
+                    <p>Rating: {avgrating}/5</p>
                     <p>Raters: {numofraters}</p>
                 </div>
-                    <p>Amount Donated: {amountdonated} Algo</p>
+                    <p>Amount Donated: {microAlgosToString(amountdonated) * 1} Algo</p>
                 {mentor.owner === address && 
                     <>   
                         <div className="edit">
@@ -51,20 +51,34 @@ const NewMentor = ({address, mentor, buyMentor, deleteMentor, rateMentor, change
                         </div>
                         <div>
                             <input placeholder="Amount" type="number" value={supportAmount} onChange = { (e) => setSupportAmount(e.target.value) } />
-                            <button className='newbtn' onClick = {() => supportMentor(mentor, supportAmount)}> Support Mentor</button>
+                            <button className='newbtn' onClick = {() => supportMentor(mentor, stringToMicroAlgos(supportAmount))}> Support Mentor</button>
                         </div>
-                        <Dropdown>
-                            <Dropdown.Toggle variant="success" id="dropdown-basic">
-                                Rate Mentor
-                            </Dropdown.Toggle>
-                            <Dropdown.Menu>
-                                <Dropdown.Item onClick={() => rateMentor(mentor,1)}>1</Dropdown.Item>
-                                <Dropdown.Item onClick={() => rateMentor(mentor,2)}>2</Dropdown.Item>
-                                <Dropdown.Item onClick={() => rateMentor(mentor,3)}>3</Dropdown.Item>
-                                <Dropdown.Item onClick={() => rateMentor(mentor,4)}>4</Dropdown.Item>
-                                <Dropdown.Item onClick={() => rateMentor(mentor,5)}>5</Dropdown.Item>
-                            </Dropdown.Menu>
-                        </Dropdown>   
+                        {mentor.hasbought === 0 && 
+                        <>
+                            <button className="ratebtn">Buy to rate</button>
+                        </>
+                        }
+                        {mentor.hasrated === 1 &&
+                        <>
+                            <button className="ratebtn" >Already Rated</button>
+                        </>
+                        }
+                        {mentor.hasbought === 1 && mentor.hasrated === 0 &&
+                        <>
+                            <Dropdown>
+                                <Dropdown.Toggle variant="success" id="dropdown-basic">
+                                    Rate Mentor
+                                </Dropdown.Toggle>
+                                <Dropdown.Menu>
+                                    <Dropdown.Item onClick={() => rateMentor(mentor,1)}>1</Dropdown.Item>
+                                    <Dropdown.Item onClick={() => rateMentor(mentor,2)}>2</Dropdown.Item>
+                                    <Dropdown.Item onClick={() => rateMentor(mentor,3)}>3</Dropdown.Item>
+                                    <Dropdown.Item onClick={() => rateMentor(mentor,4)}>4</Dropdown.Item>
+                                    <Dropdown.Item onClick={() => rateMentor(mentor,5)}>5</Dropdown.Item>
+                                </Dropdown.Menu>
+                            </Dropdown>   
+                        </>
+                        }
                     </>
                 }
             </div>

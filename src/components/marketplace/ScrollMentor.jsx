@@ -3,7 +3,13 @@ import {toast} from "react-toastify";
 import AddMentor from "./AddMentor";
 import Loader from "../utils/Loader";
 import {NotificationError, NotificationSuccess} from "../utils/Notifications";
-import {buyMentorAction, createMentorAction, deleteMentorAction, getMentorAction, rateMentorAction, changePriceAction, supportMentorAction} from "../../utils/marketplace";
+import {
+			buyMentorAction, createMentorAction, 
+			deleteMentorAction, getMentorAction, 
+			rateMentorAction, changePriceAction, 
+			supportMentorAction, optIn
+		} from "../../utils/marketplace";
+
 import PropTypes from "prop-types";
 import NewMentor from "./NewMentor";
 
@@ -14,7 +20,7 @@ const ScrollMentor = ({address, fetchBalance}) => {
 
     const getMentors = async () => {
         setLoading(true);
-        getMentorAction()
+        getMentorAction(address)
             .then(mentors => {
                 if (mentors) {
                     setMentors(mentors);
@@ -50,6 +56,7 @@ const ScrollMentor = ({address, fetchBalance}) => {
     };
 
     const buyMentor = async (mentor, count) => {
+		await optIn(address, mentor.appId);
 	    setLoading(true);
         console.log(mentor);
 	    buyMentorAction(address, mentor, count)
@@ -67,8 +74,6 @@ const ScrollMentor = ({address, fetchBalance}) => {
 
     const supportMentor = async (mentor, amount) => {
 	    setLoading(true);
-        console.log(mentor);
-        console.log(amount);
 	    supportMentorAction(address, mentor, amount)
 	        .then(() => {
 	            toast(<NotificationSuccess text="Mentor Supported successfully"/>);

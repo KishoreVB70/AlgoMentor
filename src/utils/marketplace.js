@@ -22,7 +22,7 @@ import { stringToMicroAlgos } from "./conversions";
 
 class Mentor {
     
-    constructor(expertise, description, price, avgrating, numofraters, totalrating, buyers, amountdonated, appId, owner) {
+    constructor(expertise, description, price, avgrating, numofraters, totalrating, buyers,  amountdonated, hasbought, hasrated, appId, owner) {
         this.expertise = expertise;
         this.description = description;
         this.price = price;
@@ -31,6 +31,8 @@ class Mentor {
         this.totalrating = totalrating;
         this.buyers = buyers;
         this.amountdonated = amountdonated;
+        this.hasbought = hasbought;
+        this.hasrated = hasrated;
         this.appId = appId;
         this.owner = owner;
     }
@@ -99,6 +101,33 @@ export const createMentorAction = async (senderAddress, mentor) => {
     let appId = transactionResponse['application-index'];
     console.log("Created new app-id: ", appId);
     return appId;
+}
+
+export const optIn = async (senderAddress, appId) => {
+    let accountInfo = await indexerClient.lookupAccountByID(senderAddress).do();
+    console.log(accountInfo);
+    let optInApps  = accountInfo.account["apps-local-state"];
+    if(optInApps.find(app => app.id === appId) !== undefined){
+        return;
+    }
+
+    let params = await algodClient.getTransactionParams().do();
+    // create unsigned transaction
+    let txn = algosdk.makeApplicationOptInTxn(senderAddress, params, appId);
+
+    // Get transaction ID
+    let txId = txn.txID().toString();
+
+    // Sign & submit the transaction
+    let signedTxn = await myAlgoConnect.signTransaction(txn.toByte());
+    console.log("Signed transaction with txID: %s", txId);
+    await algodClient.sendRawTransaction(signedTxn.blob).do();
+
+    // Wait for transaction to be confirmed
+    let confirmedTxn = await algosdk.waitForConfirmation(algodClient, txId, 4);
+
+    // Get the completed Transaction
+    console.log("Transaction " + txId + " confirmed in round " + confirmedTxn["confirmed-round"]);
 }
 
 
@@ -324,7 +353,7 @@ export const deleteMentorAction = async (senderAddress, index) => {
 
 
 // GET PRODUCTS: Use indexer
-export const getMentorAction = async () => {
+export const getMentorAction = async (address) => {
     console.log("Fetching products...")
     let note = new TextEncoder().encode(mentorNote);
     let encodedNote = Buffer.from(note).toString("base64");
@@ -340,7 +369,7 @@ export const getMentorAction = async () => {
         let appId = transaction["created-application-index"]
         if (appId) {
             // Step 2: Get each application by application id
-            let mentor = await getApplication(appId)
+            let mentor = await getApplication(appId, address)
             if (mentor) {
                 products.push(mentor)
                 console.log(mentor)
@@ -351,7 +380,7 @@ export const getMentorAction = async () => {
     return products
 }
 
-const getApplication = async (appId) => {
+const getApplication = async (appId, senderAddress) => {
     try {
         // 1. Get application by appId
         let response = await indexerClient.lookupApplications(appId).includeAll(true).do();
@@ -370,6 +399,8 @@ const getApplication = async (appId) => {
         let numberofraters = 0
         let amountdonated = 0
         let avgrating = 0
+        let hasrated = 0
+        let hasbought = 0
 
         const getField = (fieldName, globalState) => {
             return globalState.find(state => {
@@ -411,7 +442,23 @@ const getApplication = async (appId) => {
             totalrating = getField("TOTALRATING", globalState).value.uint
         }
 
-        return new Mentor(expertise, description,price, avgrating, numberofraters, totalrating, buyers,amountdonated, appId, owner)
+        let userInfo = await indexerClient.lookupAccountAppLocalStates(senderAddress).do();
+
+        let appLocalState = userInfo["apps-local-states"];
+        for (let i = 0; i < appLocalState.length; i++) {
+          if (appId === appLocalState[i]["id"]) {
+            let localState = appLocalState[i]["key-value"];
+
+            if (getField("HASBOUGHT", localState) !== undefined) {
+              hasbought = getField("HASBOUGHT",localState).value.uint;
+            }
+            if (getField("HASRATED", localState) !== undefined) {
+              hasrated = getField("HASRATED", localState).value.uint;
+            }
+          }
+        }
+
+        return new Mentor(expertise, description,price, avgrating, numberofraters, totalrating, buyers,amountdonated, hasbought, hasrated, appId, owner)
     } catch (err) {
         return null;
     }

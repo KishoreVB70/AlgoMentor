@@ -1,11 +1,14 @@
 import React from "react";
-import {Spinner} from "react-bootstrap";
-
+import "./loader.css"
 const Loader = () => (
-    <div className="d-flex justify-content-center">
-        <Spinner animation="border" role="status" className="opacity-25">
-            <span className="visually-hidden">Loading...</span>
-        </Spinner>
+    <div id="loader">
+        <div className="ls-particles ls-part-1"></div>
+        <div className="ls-particles ls-part-2"></div>
+        <div className="ls-particles ls-part-3"></div>
+        <div className="ls-particles ls-part-4"></div>
+        <div className="ls-particles ls-part-5"></div>
+        <div className="lightsaber ls-left ls-green"></div>
+        <div className="lightsaber ls-right ls-red"></div>
     </div>
 );
 

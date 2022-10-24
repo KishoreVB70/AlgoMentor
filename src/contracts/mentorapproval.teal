@@ -7,31 +7,37 @@ txn OnCompletion
 int DeleteApplication
 ==
 bnz main_l19
+txn OnCompletion
+int OptIn
+==
+bnz main_l18
 txna ApplicationArgs 0
 byte "buy"
 ==
-bnz main_l16
+bnz main_l15
 txna ApplicationArgs 0
 byte "rate"
 ==
-bnz main_l13
+bnz main_l12
 txna ApplicationArgs 0
 byte "support"
 ==
-bnz main_l10
+bnz main_l9
 txna ApplicationArgs 0
 byte "changeprice"
 ==
-bnz main_l7
+bnz main_l8
 err
-main_l7:
+main_l8:
+txna ApplicationArgs 1
+btoi
+int 0
+>
+assert
 txn Sender
 global CreatorAddress
 ==
-bnz main_l9
-int 0
-return
-main_l9:
+assert
 txn NumAppArgs
 int 2
 ==
@@ -42,7 +48,7 @@ btoi
 app_global_put
 int 1
 return
-main_l10:
+main_l9:
 global GroupSize
 int 2
 ==
@@ -63,10 +69,10 @@ btoi
 int 0
 >
 &&
-bnz main_l12
+bnz main_l11
 int 0
 return
-main_l12:
+main_l11:
 byte "AMOUNTDONATED"
 byte "AMOUNTDONATED"
 app_global_get
@@ -76,7 +82,7 @@ btoi
 app_global_put
 int 1
 return
-main_l13:
+main_l12:
 txna ApplicationArgs 1
 btoi
 int 0
@@ -90,10 +96,22 @@ txn Sender
 global CreatorAddress
 !=
 &&
-bnz main_l15
+bnz main_l14
 int 0
 return
-main_l15:
+main_l14:
+txn Sender
+byte "HASRATED"
+app_local_get
+int 0
+==
+assert
+txn Sender
+byte "HASBOUGHT"
+app_local_get
+int 1
+==
+assert
 txn NumAppArgs
 int 2
 ==
@@ -118,9 +136,13 @@ byte "NUMOFRATERS"
 app_global_get
 /
 app_global_put
+txn Sender
+byte "HASRATED"
+int 1
+app_local_put
 int 1
 return
-main_l16:
+main_l15:
 global GroupSize
 int 2
 ==
@@ -148,16 +170,31 @@ gtxn 0 Sender
 ==
 &&
 &&
-bnz main_l18
+bnz main_l17
 int 0
 return
-main_l18:
+main_l17:
 byte "BUYERS"
 byte "BUYERS"
 app_global_get
 int 1
 +
 app_global_put
+txn Sender
+byte "HASBOUGHT"
+int 1
+app_local_put
+int 1
+return
+main_l18:
+txn Sender
+byte "HASBOUGHT"
+int 0
+app_local_put
+txn Sender
+byte "HASRATED"
+int 0
+app_local_put
 int 1
 return
 main_l19:
@@ -171,8 +208,23 @@ int 3
 ==
 assert
 txn Note
-byte "mentorship:k6"
+byte "mentorship:k9"
 ==
+assert
+txna ApplicationArgs 0
+len
+int 3
+>
+assert
+txna ApplicationArgs 1
+len
+int 5
+>
+assert
+txna ApplicationArgs 2
+btoi
+int 0
+>
 assert
 byte "EXPERTISE"
 txna ApplicationArgs 0

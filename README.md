@@ -1,6 +1,6 @@
 # Algo Mentor
 - Dapp for user to meet mentors and buy mentorship from them
-### [Click here for live dapp]()
+### [Click here for live dapp](https://algomentor.netlify.app/)
 ### Features of the dapp
 - Buy mentorship based on hours
 - Rate the mentor 

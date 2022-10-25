@@ -6,7 +6,6 @@ class Mentor:
         expertise = Bytes("EXPERTISE") #byte
         description = Bytes("DESCRIPTION") #byte
         price = Bytes("PRICE") # uint64
-        avg_rating = Bytes("AVGRATING") #uint64
         num_of_raters = Bytes("NUMOFRATERS") #uint64
         total_rating = Bytes("TOTALRATING") #uint64
         buyers = Bytes("BUYERS") #uint64
@@ -36,7 +35,6 @@ class Mentor:
             App.globalPut(self.GlobalVariables.expertise, Txn.application_args[0]),
             App.globalPut(self.GlobalVariables.description, Txn.application_args[1]),
             App.globalPut(self.GlobalVariables.num_of_raters, Int(0)),
-            App.globalPut(self.GlobalVariables.avg_rating, Int(0)),
             App.globalPut(self.GlobalVariables.price, Btoi(Txn.application_args[2])),
             
             App.globalPut(self.GlobalVariables.total_rating, Int(0)),
@@ -62,6 +60,7 @@ class Mentor:
 
 
         valid_payment_to_seller = And(
+            Btoi(hours) > Int(0),
             Gtxn[1].type_enum() == TxnType.Payment,
             Gtxn[1].receiver() == Global.creator_address(),
             Gtxn[0].sender() != Global.creator_address(),
@@ -86,9 +85,11 @@ class Mentor:
         amount = Txn.application_args[1]
 
         valid_payment_to_seller = And(
+            Gtxn[1].sender() != Global.creator_address(),
             Gtxn[1].type_enum() == TxnType.Payment,
             Gtxn[1].receiver() == Global.creator_address(),
             Gtxn[1].sender() == Gtxn[0].sender(),
+            Gtxn[1].amount() == Btoi(amount)
         )
 
         can_donate= And(valid_number_of_transactions,
@@ -120,7 +121,7 @@ class Mentor:
 
         #update state
         update_state = Seq([
-            # Checks to ensure that the user has bought the mentorship and has not rated yet
+            # Checks to ensure that the user has bought the mentorship and has not yet rated
             Assert(App.localGet(Txn.sender(), self.LocalVariables.has_rated) == Int(0)),
             Assert(App.localGet(Txn.sender(), self.LocalVariables.has_bought) == Int(1)),
 
@@ -129,9 +130,6 @@ class Mentor:
             # State changes for calculating the rating
             App.globalPut(self.GlobalVariables.num_of_raters, App.globalGet(self.GlobalVariables.num_of_raters) + Int(1)),
             App.globalPut(self.GlobalVariables.total_rating, App.globalGet(self.GlobalVariables.total_rating) + Btoi(rating)),
-            App.globalPut(self.GlobalVariables.avg_rating,  
-                            App.globalGet(self.GlobalVariables.total_rating) / App.globalGet(self.GlobalVariables.num_of_raters)),
-
             # sets hasrated so that the user cannot rate again
             App.localPut(Txn.sender(), self.LocalVariables.has_rated, Int(1)),
             Approve()

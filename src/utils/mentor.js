@@ -22,7 +22,7 @@ import { stringToMicroAlgos } from "./conversions";
 
 class Mentor {
     
-    constructor(expertise, description, price, avgrating, numofraters, totalrating, buyers,  amountdonated, hasbought, hasrated, hasopt, appId, owner) {
+    constructor(expertise, description, price, avgrating, numofraters, totalrating, buyers,  amountdonated, hasbought, hasrated, appId, owner) {
         this.expertise = expertise;
         this.description = description;
         this.price = price;
@@ -31,9 +31,6 @@ class Mentor {
         this.totalrating = totalrating;
         this.buyers = buyers;
         this.amountdonated = amountdonated;
-        this.hasbought = hasbought;
-        this.hasrated = hasrated;
-        this.hasopt = hasopt;
         this.appId = appId;
         this.owner = owner;
     }
@@ -366,11 +363,13 @@ export const getMentorAction = async (address) => {
         if (appId) {
             // Step 2: Get each application by application id
             let mentor = await getApplication(appId, address)
+            console.log(appId, address);
             if (mentor) {
                 products.push(mentor)
             }
         }
     }
+    console.log(products);
     return products
 }
 
@@ -395,13 +394,6 @@ const getApplication = async (appId, senderAddress) => {
         let avgrating = 0
         let hasrated = 0
         let hasbought = 0
-        let hasopt = 0
-
-        let accountInfo = await indexerClient.lookupAccountByID(senderAddress).do();
-        let optInApps  = accountInfo.account["apps-local-state"];
-        if(optInApps.find(app => app.id === appId) !== undefined){
-            hasopt = 1;
-        }
 
         const getField = (fieldName, globalState) => {
             return globalState.find(state => {
@@ -445,21 +437,21 @@ const getApplication = async (appId, senderAddress) => {
 
         let userInfo = await indexerClient.lookupAccountAppLocalStates(senderAddress).do();
 
-        let appLocalState = userInfo["apps-local-states"];
-        for (let i = 0; i < appLocalState.length; i++) {
-          if (appId === appLocalState[i]["id"]) {
-            let localState = appLocalState[i]["key-value"];
+        // let appLocalState = userInfo["apps-local-states"];
+        // for (let i = 0; i < appLocalState.length; i++) {
+        //   if (appId === appLocalState[i]["id"]) {
+        //     let localState = appLocalState[i]["key-value"];
 
-            if (getField("HASBOUGHT", localState) !== undefined) {
-              hasbought = getField("HASBOUGHT",localState).value.uint;
-            }
-            if (getField("HASRATED", localState) !== undefined) {
-              hasrated = getField("HASRATED", localState).value.uint;
-            }
-          }
-        }
-
-        return new Mentor(expertise, description,price, avgrating, numberofraters, totalrating, buyers,amountdonated, hasbought, hasrated, hasopt, appId, owner)
+        //     if (getField("HASBOUGHT", localState) !== undefined) {
+        //       hasbought = getField("HASBOUGHT",localState).value.uint;
+        //     }
+        //     if (getField("HASRATED", localState) !== undefined) {
+        //       hasrated = getField("HASRATED", localState).value.uint;
+        //     }
+        //   }
+        // }
+        console.log(owner);
+        return new Mentor(expertise, description,price, avgrating, numberofraters, totalrating, buyers,amountdonated, hasbought, hasrated, appId, owner)
     } catch (err) {
         return null;
     }
